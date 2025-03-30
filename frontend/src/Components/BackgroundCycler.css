@@ -1,0 +1,55 @@
+/* src/components/BackgroundCycler.css */
+.bg-container {
+    position: absolute;
+    top: 0;
+    /* 기존 LandingHome에서는 배경 div의 left를 아래와 같이 지정했으므로 동일하게 */
+    left: calc((712 / 1512) * 100%);
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+  
+  .bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+  }
+  
+  /* 현재 이미지: 슬라이드 아웃 (위로 이동하며 사라짐) */
+  .animate-out {
+    animation: slideUpOut 1.5s forwards ease-in-out;
+  }
+  
+  /* 다음 이미지: 아래에서 위로 슬라이드 인 */
+  .animate-in {
+    animation: slideUpIn 1.5s forwards ease-in-out;
+  }
+  
+  @keyframes slideUpOut {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+  }
+  
+  @keyframes slideUpIn {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  

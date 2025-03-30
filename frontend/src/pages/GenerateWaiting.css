@@ -1,0 +1,140 @@
+/* 왼쪽 위 블러 원 */
+.bg-left-top {
+    position: absolute;
+    top: 20%;
+    left: 35%;
+    width: 340px;
+    height: 340px;
+    background-color: rgba(198, 249, 255, 0.55);
+    border-radius: 50%;
+    filter: blur(70.481px);
+    z-index: 0;
+  
+    /* 애니메이션: 8초 주기, 무한 반복 */
+    animation: animateLeftTop 8s infinite ease-in-out;
+  }
+  
+  /* 오른쪽 블러 원 */
+  .bg-right {
+    position: absolute;
+    top: 35%;
+    right: 35%;
+    width: 350px;
+    height: 350px;
+    background-color: rgba(250, 237, 206, 0.55);
+    border-radius: 50%;
+    filter: blur(70.481px);
+    z-index: 0;
+  
+    /* 애니메이션: 10초 주기, 무한 반복 */
+    animation: animateRight 12s infinite ease-in-out;
+  }
+  
+  /* 왼쪽 아래 블러 원 */
+  .bg-left-bottom {
+    position: absolute;
+    bottom: 25%;
+    left: 40%;
+    width: 240px;
+    height: 240px;
+    background-color: rgba(136, 211, 255, 0.55);
+    border-radius: 50%;
+    filter: blur(70.481px);
+    z-index: 0;
+  
+    /* 애니메이션: 9초 주기, 무한 반복 */
+    animation: animateLeftBottom 10s infinite ease-in-out;
+  }
+  
+  /* 왼쪽 위 원 애니메이션:
+     - 회전(rotate)
+     - 이동(translate)
+     - 크기(scale)
+     - 색상/투명도
+     - 블러(filter)
+     전부 조금씩 변화 */
+  @keyframes animateLeftTop {
+    0% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      background-color: rgba(198, 249, 255, 0.55);
+      filter: blur(20px);
+    }
+    25% {
+      transform: translate(-100px, -60px) scale(1.3) rotate(90deg);
+      background-color: rgba(198, 249, 255, 0.8);
+      filter: blur(60px);
+    }
+    50% {
+      transform: translate(0, 40px) scale(1.1) rotate(180deg);
+      background-color: rgba(198, 249, 255, 0.3);
+      filter: blur(40px);
+    }
+    75% {
+      transform: translate(80px, -60px) scale(1.4) rotate(270deg);
+      background-color: rgba(198, 249, 255, 0.7);
+      filter: blur(80px);
+    }
+    100% {
+      transform: translate(0, 0) scale(1) rotate(360deg);
+      background-color: rgba(198, 249, 255, 0.55);
+      filter: blur(20px);
+    }
+  }
+  
+  /* 오른쪽 원 애니메이션 */
+  @keyframes animateRight {
+    0% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      background-color: rgba(250, 237, 206, 0.55);
+      filter: blur(20px);
+    }
+    25% {
+      transform: translate(100px, 20px) scale(1.2) rotate(90deg);
+      background-color: rgba(250, 237, 206, 0.85);
+      filter: blur(50px);
+    }
+    50% {
+      transform: translate(-60px, 40px) scale(1.1) rotate(180deg);
+      background-color: rgba(250, 237, 206, 0.35);
+      filter: blur(70px);
+    }
+    75% {
+      transform: translate(80px, -40px) scale(1.3) rotate(270deg);
+      background-color: rgba(250, 237, 206, 0.75);
+      filter: blur(90px);
+    }
+    100% {
+      transform: translate(0, 0) scale(1) rotate(360deg);
+      background-color: rgba(250, 237, 206, 0.55);
+      filter: blur(20px);
+    }
+  }
+  
+  /* 왼쪽 아래 원 애니메이션 */
+  @keyframes animateLeftBottom {
+    0% {
+      transform: translate(-20px, 0) scale(1) rotate(0deg);
+      background-color: rgba(136, 211, 255, 0.55);
+      filter: blur(20px);
+    }
+    25% {
+      transform: translate(-80px, 80px) scale(1.25) rotate(90deg);
+      background-color: rgba(136, 211, 255, 0.8);
+      filter: blur(40px);
+    }
+    50% {
+      transform: translate(40px, -40px) scale(1.15) rotate(180deg);
+      background-color: rgba(136, 211, 255, 0.3);
+      filter: blur(80px);
+    }
+    75% {
+      transform: translate(100px, 60px) scale(1.4) rotate(270deg);
+      background-color: rgba(136, 211, 255, 0.6);
+      filter: blur(60px);
+    }
+    100% {
+      transform: translate(0, 0) scale(1) rotate(360deg);
+      background-color: rgba(136, 211, 255, 0.55);
+      filter: blur(20px);
+    }
+  }  
