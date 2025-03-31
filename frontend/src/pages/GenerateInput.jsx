@@ -40,6 +40,7 @@ function GenerateInput() {
 
   // 분석하기 버튼 클릭 핸들러
   const handleAnalyze = async () => {
+    console.log("handleAnalyze called");
     try {
       // 전송할 데이터 구성
       const dataToSend = {
@@ -48,32 +49,35 @@ function GenerateInput() {
         selectedEmotions,
       };
 
-      console.log('분석하기 버튼 클릭 완료, 전송할 데이터:', dataToSend);
+      console.log('전송할 데이터:', dataToSend);
 
       // 새로 만든 우리 모델 API 엔드포인트 호출
+      // 그러면 firebase.json의 rewrites 설정에 따라 functions의 exports.api 함수로 전달
+      
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
       });
 
+      console.log('fetch 호출 후, response.status:', response.status);
+
       if (!response.ok) {
-        throw new Error('API 호출 실패');
+        throw new Error('API 호출 실패, 상태 코드: ' + response.status);
       }
 
       const result = await response.json();
-      console.log('API 응답:', result);
+      console.log('API 응답 JSON:', result);
 
-      // (예시) 결과로 받은 이미지 Base64 데이터를 저장할 수 있음
-      // localStorage.setItem('generatedImage', result.imageBase64);
+      // (예시) 결과로 받은 이미지 Base64 데이터를 저장 (원하는 방식으로 처리)
+      // 예: localStorage.setItem('generatedImage', result.imageBase64);
 
       // 대기 페이지 혹은 결과 페이지로 이동
       navigate('/generatewaiting');
-
       alert('이미지 생성 요청 완료! (콘솔에서 결과 확인)');
     } catch (error) {
       console.error('분석 에러:', error);
-      alert('분석 중 오류가 발생했습니다.');
+      alert('분석 중 오류가 발생했습니다: ' + error.message);
       navigate('/generatewaiting');
     }
   };
