@@ -5,11 +5,11 @@ import Header from '../Components/Header';
 
 function GenerateOutput() {
   const [imageBase64, setImageBase64] = useState(null);
-  const [nickname, setNickname] = useState('Geranium');
+  const [nickname, setNickname] = useState('Example_user');
   const [date, setDate] = useState('');
-  const [title, setTitle] = useState('');  // "행복기" 등 AI가 생성한 작품 제목
-  const [description, setDescription] = useState(''); // "어떤 이유로 이런 이미지가 나왔는지..." 등
-
+  // 실제 제목과 설명은 gpt거쳐서 가져오는 로직은 조금 나중에 구현 예정.. 일단 샘플로
+  const [title, setTitle] = useState('Untitled');
+  const [description, setDescription] = useState('No description available.');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,18 +22,22 @@ function GenerateOutput() {
       setImageBase64(storedImage);
     }
 
-    // (예시) 날짜, 제목, 설명 등도 localStorage나 전역 상태에서 가져올 수 있음
     const storedTitle = localStorage.getItem('generatedTitle') || 'TEST';
     const storedDesc = localStorage.getItem('generatedDesc') || 'AI가 분석한 감정 설명...';
     setTitle(storedTitle);
     setDescription(storedDesc);
 
-    // 날짜도 마찬가지로, 실제 DB나 로컬스토리지에서 불러오거나
+    // 현재 날짜 설정
     const now = new Date();
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: 'numeric', 
+      minute: '2-digit' 
+    };
     const formattedDate = now.toLocaleString('en-US', options);
     setDate(formattedDate);
-
   }, [navigate]);
 
   return (

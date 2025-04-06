@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import Header from '../Components/Header';
 
 function GenerateInput() {
@@ -15,7 +16,7 @@ function GenerateInput() {
   const [emotionLevel, setEmotionLevel] = useState(50);
 
   // 감정 종류 (멀티 선택 가능)
-  const emotionKinds = ['기쁨', '슬픔', '분노', '놀람', '평온', '무기력', '긴장', '만족'];
+  const emotionKinds = ['joy', 'sadness', 'anger', 'surprise', 'anticipation', 'disgust', 'trust', 'fear'];
   const [selectedEmotions, setSelectedEmotions] = useState([]);
 
   // 텍스트 입력 (1500자 이내)
@@ -48,7 +49,6 @@ function GenerateInput() {
         emotionLevel,
         selectedEmotions,
       };
-
       console.log('전송할 데이터:', dataToSend);
 
       // 새로 만든 우리 모델 API 엔드포인트 호출
@@ -59,7 +59,6 @@ function GenerateInput() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),
       });
-
       console.log('fetch 호출 후, response.status:', response.status);
 
       if (!response.ok) {
@@ -69,11 +68,13 @@ function GenerateInput() {
       const result = await response.json();
       console.log('API 응답 JSON:', result);
 
-      // (예시) 결과로 받은 이미지 Base64 데이터를 저장 (원하는 방식으로 처리)
-      // 예: localStorage.setItem('generatedImage', result.imageBase64);
-
-      // 대기 페이지 혹은 결과 페이지로 이동
-      navigate('/generatewaiting');
+      // 작업 요청에 대한 jobId를 받아 localStorage에 저장
+      if (result.success && result.jobId) {
+        localStorage.setItem('jobId', result.jobId);
+        navigate('/generatewaiting');
+      } else {
+        throw new Error("작업 요청 실패");
+       }
       alert('이미지 생성 요청 완료! (콘솔에서 결과 확인)');
     } catch (error) {
       console.error('분석 에러:', error);
