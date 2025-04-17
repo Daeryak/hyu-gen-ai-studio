@@ -7,6 +7,7 @@
     import GenerateInput from './pages/GenerateInput'; 
     import GenerateWaiting from './pages/GenerateWaiting'; 
     import GenerateOutput from './pages/GenerateOutput';
+    import Login from './pages/Login';
     // 다른 페이지가 있다면 필요 시 import
 
     function App() {
@@ -19,6 +20,7 @@
             <Route path="/generateinput" element={<GenerateInput />} />
             <Route path="/generatewaiting" element={<GenerateWaiting />} />
             <Route path="/generateoutput" element={<GenerateOutput />} />
+            <Route path="/login" element={<Login />} />
         </Routes>
         </Router>
     );

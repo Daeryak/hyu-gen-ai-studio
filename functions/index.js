@@ -8,9 +8,8 @@ const fs = require("fs"); // file system 모듈 서버에서 파일 읽고 쓸 �
 const path = require("path"); // path 모듈 선언
 
 // Admin SDK 초기화
-var admin = require("firebase-admin");
-
-var serviceAccount = require("path/to/serviceAccountKey.json");
+// var로 선언하는 부분은 위에서 이미 const로 선언해뒀음.
+var serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)

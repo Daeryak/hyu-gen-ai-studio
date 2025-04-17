@@ -1,0 +1,84 @@
+/* 화면 전체를 정중앙 정렬하기 위한 래퍼 */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;           /* 세로 전체 꽉 채우기 */
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+
+/* 실제 로그인 박스 */
+.login-container {
+  width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;       /* 자식 요소가 범위를 넘어가면 가려주기 */
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 그라데이션 영역 */
+.login-header {
+  background: linear-gradient(to right, #fff3bc, #b2d7ff);
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 상단 ‘로그인’ 타이틀 */
+.login-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* 본문 영역 */
+.login-body {
+  padding: 30px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 구글 로그인 버튼 */
+.google-login-btn {
+  width: 100%;
+  max-width: 300px;
+  padding: 14px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+/* 버튼 호버 시 색상 변화 */
+.google-login-btn:hover {
+  background-color: #f9f9f9;
+}
+
+/* 구글 아이콘 이미지(예시) */
+.google-login-btn img {
+  width: 20px;
+  margin-right: 8px;
+}
+
+/* 오류 메시지 */
+.error-message {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
