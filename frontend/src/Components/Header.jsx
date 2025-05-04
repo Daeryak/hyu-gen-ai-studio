@@ -1,8 +1,17 @@
 // src/components/Header.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate, useLocation } from 'react-router-dom';
 
-function Header() {
+function Header({ isLoggedIn, onLogOut }) {
+  const navigate = useNavigate();
+  const {pathname} = useLocation(); // 현재 경로를 가져옴
+  if (pathname === "/login") return null;
+  const handleLogout = () => {
+    // 로그아웃 처리
+    onLogOut();
+    // 로그아웃 후 메인 페이지로 이동
+    navigate('/');
+  };
   return (
     <header style={styles.header}>
       <div style={styles.logo}>
@@ -12,7 +21,15 @@ function Header() {
         <Link to="/archive" style={styles.navLink}>My Archive</Link>
         <Link to="/home" style={styles.navLink}>My Home</Link>
         <Link to="/generate" style={styles.navLink}>Create</Link>
-        <Link to="/login" style={styles.navLink}>Login</Link>
+        {/*로그인 상태에 따라 로그인 링크 또는 로그아웃*/}
+        {isLoggedIn ? (
+          <button onClick={handleLogout}
+          style={styles.logoutButton}>
+          Logout
+          </button>
+        ) : (
+          <Link to="/login" style={styles.navLink}>Login</Link>
+        )}
       </nav>
     </header>
   );
@@ -52,6 +69,15 @@ const styles = {
     textDecoration: 'none',
     color: '#333',
     fontWeight: 500,
+  },
+  logoutButton: {
+    backgroundColor: 'transparent',
+    TextDecoration: 'none',
+    fontWeight: 500,
+    border: 'none',
+    color: '#333',
+    fontSize: '1rem',
+    cursor: 'pointer',
   },
 };
 

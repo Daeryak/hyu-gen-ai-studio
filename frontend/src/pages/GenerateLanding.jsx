@@ -13,7 +13,7 @@ function GenerateLanding() {
   return (
     <div style={styles.container}>
       <div>
-        <Header />
+        {/*header 따로 <Header />*/}
       </div>
       {/* <header style={styles.header}>
         <div style={styles.logo}>

@@ -42,7 +42,7 @@ function GenerateOutput() {
 
   return (
     <div style={styles.container}>
-      <Header />
+      {/*header 따로 <Header />*/}
 
       <div style={styles.contentWrapper}>
         {/* 왼쪽 영역: 텍스트 정보 */}

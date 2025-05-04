@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Header from '../Components/Header';
+//import Header from '../Components/Header';
+import {authService} from "../firebase.js";
+import { onAuthStateChanged } from 'firebase/auth';
 
 function GenerateInput() {
   const navigate = useNavigate();
 
   // (임시) 사용자 닉네임 (추후 구글 로그인 후 불러오기)
-  const [nickname, setNickname] = useState('geranium');
+  const [nickname, setNickname] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(authService, (user) => {
+      if (user) {
+        setNickname(user.displayName || user.email.split("@")[0] || 'User');
+      } else {
+        setNickname('Guest');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+
 
   // 현재 날짜 (로컬 시간 사용)
   const [currentDate, setCurrentDate] = useState('');
@@ -87,7 +102,8 @@ function GenerateInput() {
     <div style={styles.container}>
       {/* 헤더 */}
       <div>
-        <Header />
+        {/*header 따로 <Header />*/}
+        
       </div>
       <main style={styles.main}>
         {/* 왼쪽 영역 */}

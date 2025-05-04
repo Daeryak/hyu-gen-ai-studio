@@ -51,7 +51,7 @@ function GenerateWaiting() {
   return (
     <div style={styles.container}>
         <div>   
-            <Header />
+            {/*header 따로 <Header />*/}
         </div>
 
       {/* 블러 원들>> 클래스명으로 교체 */}
