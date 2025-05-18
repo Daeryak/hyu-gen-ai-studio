@@ -8,7 +8,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 function GenerateInput() {
   const navigate = useNavigate();
 
-  // (임시) 사용자 닉네임 (추후 구글 로그인 후 불러오기)
+  // (임시) 사용자 닉네임 (추후 구글 로그인 후 불러오기 )
   const [nickname, setNickname] = useState("");
 
   useEffect(() => {
@@ -68,10 +68,14 @@ function GenerateInput() {
 
       // 새로 만든 우리 모델 API 엔드포인트 호출
       // 그러면 firebase.json의 rewrites 설정에 따라 functions의 exports.api 함수로 전달
-      
+      // 인증된 사용자만 호출할 수 있도록
+      const idToken = await authService.currentUser.getIdToken();
       const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
         body: JSON.stringify(dataToSend),
       });
       console.log('fetch 호출 후, response.status:', response.status);

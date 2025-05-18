@@ -1,43 +1,40 @@
 // src/components/Header.jsx
 import React from 'react';
-import { Link,useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
-function Header({ isLoggedIn, onLogOut }) {
+export default function Header({ user, onLogOut }) {
   const navigate = useNavigate();
-  const {pathname} = useLocation(); // 현재 경로를 가져옴
+  const { pathname } = useLocation();
+
   if (pathname === "/login") return null;
+
   const handleLogout = () => {
-    // 로그아웃 처리
     onLogOut();
-    // 로그아웃 후 메인 페이지로 이동
     navigate('/');
   };
+
   return (
     <header style={styles.header}>
-      <div style={styles.logo}>
-        <Link to="/" style={styles.logoLink}>GEN.AI</Link>
-      </div>
+      <Link to="/" style={styles.logoLink}>GEN.AI</Link>
       <nav style={styles.nav}>
-        <Link to="/archive" style={styles.navLink}>My Archive</Link>
-        <Link to="/home" style={styles.navLink}>My Home</Link>
+        {/* <Link to="/archive" style={styles.navLink}>My Archive</Link> */}
+        {/* <Link to="/home" style={styles.navLink}>My Home</Link> */}
         <Link to="/generate" style={styles.navLink}>Create</Link>
-        {/*로그인 상태에 따라 로그인 링크 또는 로그아웃*/}
-        {isLoggedIn ? (
-          <button onClick={handleLogout}
-          style={styles.logoutButton}>
-          Logout
+        {user ? (
+          <button onClick={handleLogout} style={styles.authButton}>
+            Logout
           </button>
         ) : (
-          <Link to="/login" style={styles.navLink}>Login</Link>
+          <Link to="/login" style={styles.authButton}>
+            Login
+          </Link>
         )}
       </nav>
     </header>
   );
 }
 
-
 const HEADER_HEIGHT = 60;
-
 const styles = {
   header: {
     position: 'absolute',
@@ -45,40 +42,38 @@ const styles = {
     left: 0,
     right: 0,
     height: `${HEADER_HEIGHT}px`,
-    padding: '0 8rem', // 0 뒤에 스페이스 하나 무조건 넣어야됨. 뒤의 rem앞 숫자로만 조절.
+    padding: '0 8rem',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     zIndex: 2,
     backgroundColor: 'transparent',
   },
-  logo: {
-  },
   logoLink: {
-    fontFamily: 'MuseoModerno, sans-serif',
+    fontFamily: 'MuseoModerno',
     textDecoration: 'none',
     color: '#333',
     fontSize: '1.5rem',
     fontWeight: 'bold',
   },
   nav: {
+    fontFamily: 'Pretendard, sans-serif',
     display: 'flex',
-    gap: '10rem', // nav간 간격
+    alignItems: 'center',
+    gap: '10rem',
   },
   navLink: {
     textDecoration: 'none',
     color: '#333',
     fontWeight: 500,
   },
-  logoutButton: {
+  authButton: {
     backgroundColor: 'transparent',
-    TextDecoration: 'none',
-    fontWeight: 500,
     border: 'none',
     color: '#333',
+    fontWeight: 500,
     fontSize: '1rem',
     cursor: 'pointer',
+    textDecoration: 'none',
   },
 };
-
-export default Header;

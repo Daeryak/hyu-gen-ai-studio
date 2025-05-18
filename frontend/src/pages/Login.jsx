@@ -1,4 +1,4 @@
-import React, {useState, useEffect, use} from "react";
+import React, {useState} from "react";
 import {signInWithPopup,
          GoogleAuthProvider,
          updateProfile} from "firebase/auth";

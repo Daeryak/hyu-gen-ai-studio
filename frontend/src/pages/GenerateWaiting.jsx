@@ -1,16 +1,15 @@
-// import React from 'react';
-import React, { useState, useEffect } from 'react';
+// src/pages/GenerateWaiting.jsx
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../Components/Header';
-
+// import Header from '../Components/Header';
 import './GenerateWaiting.css';
 
 function GenerateWaiting() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState("pending");
+  // const [status, setStatus] = useState("pending");
 
-  //useeffect를 활용해 컴포넌트가 들어오면 local에서 jobid를 가져옴.
-  //없으면 다시 input 페이지로 보냄.
+  // useEffect를 활용해 컴포넌트가 들어오면 local에서 jobId를 가져옴.
+  // 없으면 다시 input 페이지로 보냄.
   useEffect(() => {
     const jobId = localStorage.getItem('jobId');
     if (!jobId) {
@@ -20,23 +19,28 @@ function GenerateWaiting() {
     }
 
     // 3초마다 작업 상태 generate의 status를 호출해서 작업 상태 확인 (생성 완료됐는지)
-    // ready가 되면 Base64를 로컬에 저장해서 output 페이지로 이동
+    // ready가 되면 output 페이지로 이동
     const interval = setInterval(async () => {
       try {
+        // status 조회
         const response = await fetch(`/api/generate/status?jobId=${jobId}`);
+        const data = await response.json();
+
         if (!response.ok) {
           throw new Error('상태 조회 실패, 상태 코드: ' + response.status);
         }
-        const data = await response.json();
         console.log('폴링 응답:', data);
-        // 작업 상태가 "ready"이면, 결과(이미지 데이터)가 준비된 것으로 간주
+
+        // 작업 상태가 "ready"이면 output 페이지로 이동
         if (data.success && data.status === 'ready') {
-          localStorage.setItem('generatedImage', data.imageBase64);
+          // clearInterval 후 output으로
           clearInterval(interval);
           navigate('/generateoutput');
-        } else if (data.success && data.status === 'error') {
+        }
+        // 작업 상태가 "error"이면 input 페이지로
+        else if (data.success && data.status === 'error') {
           clearInterval(interval);
-          alert('이미지 생성에 실패했습니다: ' + (data.error || ''));
+          alert('이미지 생성에 실패했습니다: ' + (data.errorMessage || ''));
           navigate('/generateinput');
         }
         // 계속 "pending"이면 그대로 대기
@@ -50,9 +54,7 @@ function GenerateWaiting() {
 
   return (
     <div style={styles.container}>
-        <div>   
-            {/*header 따로 <Header />*/}
-        </div>
+      {/* header 따로 <Header /> */}
 
       {/* 블러 원들>> 클래스명으로 교체 */}
       <div className="bg-left-top" />
@@ -83,7 +85,6 @@ const styles = {
     overflow: 'hidden',
     backgroundColor: '#fdfdfd',
   },
-
   main: {
     position: 'relative',
     zIndex: 1,
