@@ -1,12 +1,17 @@
 import React, {useState} from "react";
-import {signInWithPopup, GoogleAuthProvider} from "firebase/auth";
+import {signInWithPopup,
+         GoogleAuthProvider,
+         updateProfile} from "firebase/auth";
 import {authService} from "../firebase";
 import {useNavigate} from "react-router-dom";
 import "./Login.css";
 
+
+
 const Login = () => {
     const navigate = useNavigate();
     const [error, setError] = useState("");
+    
     const onSocialClick = async (event) => {
         const {target: {name}} = event;
         // 구글 로그인 처리
@@ -16,8 +21,13 @@ const Login = () => {
             try{
                 const data = await signInWithPopup(authService, provider);
                 console.log(data);
-                // 로그인 성공 후에 메인페이지로 이동
-                navigate("/");
+                const user = data.user;
+                //email 앞부분만 잘라서 id로 사용
+                const email = user.email;
+                const customId = email.substring(0, email.indexOf("@"));
+                await updateProfile(authService.currentUser, {
+                    displayName: customId});
+                navigate("/");// 로그인 성공 후에 메인페이지로 이동
             }catch(error) {
                 console.log(error.message);
                 setError(error.message);
@@ -25,8 +35,9 @@ const Login = () => {
             
         }
     };
+
     return(
-        <div className="login-wrapper">
+      <div className="login-wrapper">
         <div className="login-container">
           {/* 상단 그라데이션 영역 */}
           <div className="login-header">
@@ -53,6 +64,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+    
     );
 };
 

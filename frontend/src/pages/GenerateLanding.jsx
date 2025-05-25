@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../Components/Header';
+// import Header from '../Components/Header';
 import './GenerateLanding.css';
 
 function GenerateLanding() {
@@ -13,7 +13,7 @@ function GenerateLanding() {
   return (
     <div style={styles.container}>
       <div>
-        <Header />
+        {/*header 따로 <Header />*/}
       </div>
       {/* <header style={styles.header}>
         <div style={styles.logo}>

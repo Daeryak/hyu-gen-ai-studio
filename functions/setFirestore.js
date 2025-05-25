@@ -1,247 +1,94 @@
-/****************************************************
- * setFirestore.js
- * - 최신 DB 구조 반영
- ****************************************************/
+// functions/setFirestore.js
 
-const admin = require("firebase-admin");
-const serviceAccount = require("./serviceAccountKey.json");
+/**
+ Firestore 초기화 및 예시 데이터 삽입 스크립트
+ - 간소화된 스키마: users, diaries 컬렉션
+ - 기존 컬렉션은 모두 삭제 후, 샘플 유저와 다이어리만 생성
+ */
 
-// 1. Firebase Admin 초기화
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json');
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   projectId: serviceAccount.project_id,
 });
 
 const db = admin.firestore();
-console.log("Firestore 연결됨. 프로젝트 ID:", admin.app().options.projectId);
 
-// ─────────────────────────────────────────────────────────────────
-// (A) 하위 컬렉션이 없는 컬렉션을 통째로 삭제
-// ─────────────────────────────────────────────────────────────────
-async function deleteCollection(collectionPath) {
-  const snapshot = await db.collection(collectionPath).get();
-  if (snapshot.empty) {
-    console.log(`[${collectionPath}] 컬렉션이 비어있음`);
-    return;
-  }
+// 컬렉션 전체 삭제
+async function deleteCollection(path) {
+  const snapshot = await db.collection(path).get();
+  if (snapshot.empty) return;
   const batch = db.batch();
-  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+  snapshot.docs.forEach(doc => batch.delete(doc.ref));
   await batch.commit();
-  console.log(`[${collectionPath}] 컬렉션 전체 문서 삭제 완료`);
+  console.log(`Deleted collection: ${path}`);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// (B) diaries 컬렉션은 likes 하위 컬렉션이 있음
-// ─────────────────────────────────────────────────────────────────
-async function deleteDiariesCollection() {
-  const diariesRef = db.collection("diaries");
-  const diariesSnap = await diariesRef.get();
-
-  if (diariesSnap.empty) {
-    console.log("[diaries] 컬렉션이 비어있음");
-    return;
-  }
-
-  for (const diaryDoc of diariesSnap.docs) {
-    const diaryDocRef = diariesRef.doc(diaryDoc.id);
-
-    // diaries/{diaryID}/likes 삭제
-    await deleteSubcollection(diaryDocRef, "likes");
-
-    // diaries/{diaryID} 문서 삭제
-    await diaryDocRef.delete();
-    console.log(`Deleted diary doc: ${diaryDocRef.path}`);
-  }
-
-  console.log("[diaries] 컬렉션 삭제 완료");
-}
-
-// ─────────────────────────────────────────────────────────────────
-// (C) analysis 컬렉션은 emoToImg 하위 컬렉션이 있음
-// ─────────────────────────────────────────────────────────────────
-async function deleteAnalysisCollection() {
-  const analysisRef = db.collection("analysis");
-  const analysisSnap = await analysisRef.get();
-
-  if (analysisSnap.empty) {
-    console.log("[analysis] 컬렉션이 비어있음");
-    return;
-  }
-
-  for (const anaDoc of analysisSnap.docs) {
-    const anaDocRef = analysisRef.doc(anaDoc.id);
-
-    // analysis/{analysisID}/emoToImg 삭제
-    await deleteSubcollection(anaDocRef, "emoToImg");
-
-    // analysis/{analysisID} 문서 삭제
-    await anaDocRef.delete();
-    console.log(`Deleted analysis doc: ${anaDocRef.path}`);
-  }
-
-  console.log("[analysis] 컬렉션 삭제 완료");
-}
-
-// ─────────────────────────────────────────────────────────────────
-// (D) 특정 문서의 하위 컬렉션을 모두 삭제
-// ─────────────────────────────────────────────────────────────────
-async function deleteSubcollection(parentDocRef, subcollectionName) {
-  const subRef = parentDocRef.collection(subcollectionName);
-  const subSnap = await subRef.get();
-  if (subSnap.empty) {
-    return;
-  }
-  for (const doc of subSnap.docs) {
-    await doc.ref.delete();
-    console.log(`Deleted sub-doc: ${doc.ref.path}`);
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// (E) reviews 컬렉션은 문서 ID = userID (단일 레벨)
-//     여러 댓글을 array로 저장하므로, 일반 deleteCollection() 사용
-// ─────────────────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────────────────
-// (F) Firestore 전체 초기화
-// ─────────────────────────────────────────────────────────────────
 async function resetFirestore() {
-  try {
-    console.log("Firestore 데이터 초기화 시작");
+  console.log('Firestore 초기화 시작');
 
-    // 1) followers, following, archives, users, reviews
-    const simpleCollections = ["followers", "following", "archives", "users", "reviews"];
-    for (const c of simpleCollections) {
-      await deleteCollection(c);
-    }
-
-    // 2) diaries (하위 컬렉션 likes)
-    await deleteDiariesCollection();
-
-    // 3) analysis (하위 컬렉션 emoToImg)
-    await deleteAnalysisCollection();
-
-    console.log("모든 기존 컬렉션 삭제 완료");
-
-    // 4) 예시 데이터 삽입
-    await seedFirestoreData();
-
-    console.log("Firestore 데이터 초기화 완료");
-  } catch (error) {
-    console.error("Firestore 초기화 중 오류 발생:", error);
+  // 1) 불필요한 컬렉션 삭제
+  const oldCollections = ['jobs', 'followers', 'archives', 'reviews', 'analysis'];
+  for (const name of oldCollections) {
+    await deleteCollection(name);
   }
+
+  // 2) users & diaries 삭제 (새로 생성할 예정)
+  await deleteCollection('users');
+  await deleteCollection('diaries');
+
+  console.log('기존 데이터 삭제 완료');
+
+  // 3) 샘플 users, diaries 삽입
+  await seedExampleData();
+  console.log('예시 데이터 삽입 완료');
 }
 
-// ─────────────────────────────────────────────────────────────────
-// (G) 예시 데이터 삽입
-// ─────────────────────────────────────────────────────────────────
-async function seedFirestoreData() {
-  console.log("Firestore에 테스트 데이터 추가 중");
+async function seedExampleData() {
+  console.log('예시 데이터 삽입 시작');
 
-  // Batch 사용
-  const batch = db.batch();
+  // 3-1) users 컬렉션
+  // 문서 ID = testUser
+  // displayName: 사용자 이름
+  // email: 사용자 이메일
+  // createdAt: 프로필 생성 시점
+  await db.collection('users').doc('testUser').set({
+    displayName: '테스트유저',                             // 사용자 표시 이름
+    email: 'test@example.com',                           // 이메일
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
 
-  // 1) followers (docID = testUser)
-  const followersRef = db.collection("followers").doc("testUser");
-  batch.set(followersRef, {
-    followers_array: ["friend123", "friend456"],
-    recentDiaries: {
-      diaryID: "diary2",
-      date: admin.firestore.FieldValue.serverTimestamp(),
-    },
-  });
-
-  // 2) following (docID = testUser)
-  const followingRef = db.collection("following").doc("testUser");
-  batch.set(followingRef, {
-    following_array: ["friend789"],
-  });
-
-  // 3) archives (docID = archive1)
-  const archivesRef = db.collection("archives").doc("archive1");
-  batch.set(archivesRef, {
-    userID: "testUser",
-    diaryID: ["diary1", "diary2"],
-    visibility: "friends",
+  // 3-2) diaries 컬렉션
+  // 문서 ID = sampleDiary
+  // userId: 작성자 UID
+  // userText: 사용자가 입력한 텍스트
+  // emotionLevel: 감정 강도
+  // selectedEmotions: 감정 종류 배열
+  // prompt1, prompt2, fullPrompt: 모델 호출에 사용된 프롬프트
+  // imageUrl: 생성된 이미지 URL
+  // status: 작업 상태 (pending, ready, error)
+  // errorMessage: 실패 시 에러 메시지
+  // createdAt: 요청 시각
+  // updatedAt: 완료 시각
+  await db.collection('diaries').doc('sampleDiary').set({
+    userId: 'testUser',                                  // 작성자 UID
+    userText: '오늘 정말 행복했어요.',                     // 사용자가 입력한 글
+    emotionLevel: 85,                                    // 감정 강도
+    selectedEmotions: ['joy'],                           // 선택된 감정 종류
+    prompt1: 'A gentle abstract symphony where golden yellow, vibrant orange, and pastel pink softly swirl together, blending in a calm rhythm of emotion with no sharp edges.',  // 템플릿 + 색상
+    prompt2: ', beneath a radiant sunrise backdrop filled with golden light, soft pastel hues, and a gentle sense of celebration',  // 배경 스타일
+    fullPrompt: 'A gentle abstract symphony where golden yellow, vibrant orange, and pastel pink softly swirl together, blending in a calm rhythm of emotion with no sharp edges., beneath a radiant sunrise backdrop filled with golden light, soft pastel hues, and a gentle sense of celebration. user text: 오늘 정말 행복했어요.', // 전체 프롬프트
+    imageUrl: 'https://storage.googleapis.com/your-bucket/sampleDiary.png', // 예시 이미지 URL
+    status: 'ready',                                      // 작업 상태
+    errorMessage: null,                                  // 에러 있을 시 메시지
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
-
-  // 4) users (docID = testUser)
-  const userRef = db.collection("users").doc("testUser");
-  batch.set(userRef, {
-    name: "테스트 유저",
-    email: "test@example.com",
-    introduction: "안녕하세요! 반갑습니다.",
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-  });
-
-  // 5) reviews (docID = testUser)
-  const reviewsRef = db.collection("reviews").doc("testUser");
-  batch.set(reviewsRef, {
-    reviews: [
-      {
-        diaryID: "diary1",
-        createdBy: "testUser",
-        content: "정말 멋진 다이어리네요!",
-        date: admin.firestore.Timestamp.now(),
-      },
-      {
-        diaryID: "diary2",
-        createdBy: "friend123",
-        content: "공감이 많이 되었습니다!",
-        date: admin.firestore.Timestamp.now(),
-      },
-    ],
-  });
-
-  await batch.commit(); // 1차 커밋
-
-  // ─────────────────────────────────────────────────────────────
-  // 6) diaries (docID = diary1)
-  //    - 하위 컬렉션 likes
-  // ─────────────────────────────────────────────────────────────
-  const diaryRef = db.collection("diaries").doc("diary1");
-  await diaryRef.set({
-    userID: "testUser",
-    content: "오늘은 날씨가 정말 좋았어요",
-    reviewsID: "review1",
-    analysisID: "analysis1",
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    visibility: "public",
-  });
-
-  // diaries/{diary1}/likes/{likeDocID}
-  const likeDocRef = diaryRef.collection("likes").doc("like1");
-  await likeDocRef.set({
-    time: admin.firestore.FieldValue.serverTimestamp(),
-    likedBy: ["friend123", "friend456"],
-  });
-
-  // ─────────────────────────────────────────────────────────────
-  // 7) analysis (docID = analysis1)
-  //    - 하위 컬렉션 emoToImg
-  // ─────────────────────────────────────────────────────────────
-  const analysisDocRef = db.collection("analysis").doc("analysis1");
-  await analysisDocRef.set({
-    diaryID: "diary1",
-    userID: "testUser",
-    aiAnalysis: "오늘 기분은 80% 정도로 즐거움이었음",
-    emotion: "행복",
-    imageTitle: "따뜻한 감정의 하루",
-  });
-
-  // analysis/{analysis1}/emoToImg/{img1}
-  const emoToImgRef = analysisDocRef.collection("emoToImg").doc("img1");
-  await emoToImgRef.set({
-    prompting: "A warm gradient image representing happiness",
-    imgURL: "https://example.com/generated_image.jpg",
-    emotion: "행복",
-  });
-
-  console.log("Firestore 예시 데이터 삽입 완료!");
 }
 
-// 스크립트 실행
-resetFirestore();
+resetFirestore().catch(err => {
+  console.error('Firestore 초기화 중 오류:', err);
+  process.exit(1);
+});
