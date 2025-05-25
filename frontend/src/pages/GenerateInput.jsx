@@ -1,6 +1,6 @@
+// src/pages/GenerateOutput.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 //import Header from '../Components/Header';
 import {authService} from "../firebase.js";
 import { onAuthStateChanged } from 'firebase/auth';
@@ -8,7 +8,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 function GenerateInput() {
   const navigate = useNavigate();
 
-  // (임시) 사용자 닉네임 (추후 구글 로그인 후 불러오기 )
+  // 사용자 닉네임
   const [nickname, setNickname] = useState("");
 
   useEffect(() => {
@@ -21,22 +21,15 @@ function GenerateInput() {
     });
     return () => unsubscribe();
   }, []);
-
-
-
   // 현재 날짜 (로컬 시간 사용)
   const [currentDate, setCurrentDate] = useState('');
-
   // 감정 강도
   const [emotionLevel, setEmotionLevel] = useState(50);
-
   // 감정 종류 (멀티 선택 가능)
   const emotionKinds = ['joy', 'sadness', 'anger', 'surprise', 'anticipation', 'disgust', 'trust', 'fear'];
   const [selectedEmotions, setSelectedEmotions] = useState([]);
-
   // 텍스트 입력 (1500자 이내)
   const [userText, setUserText] = useState('');
-
   // 컴포넌트 마운트 시 현재 날짜 초기화
   useEffect(() => {
     const now = new Date();
@@ -79,10 +72,11 @@ function GenerateInput() {
         body: JSON.stringify(dataToSend),
       });
       console.log('fetch 호출 후, response.status:', response.status);
+  
 
-      if (!response.ok) {
-        throw new Error('API 호출 실패, 상태 코드: ' + response.status);
-      }
+      // if (!response.ok) {
+      //   throw new Error('API 호출 실패, 상태 코드: ' + response.status);
+      // }
 
       const result = await response.json();
       console.log('API 응답 JSON:', result);
@@ -94,9 +88,10 @@ function GenerateInput() {
       } else {
         throw new Error("작업 요청 실패");
        }
-      alert('이미지 생성 요청 완료! (콘솔에서 결과 확인)');
+      alert('이미지 생성 요청 완료! 잠시 기다려주세요.');
     } catch (error) {
       console.error('분석 에러:', error);
+      console.error('분석 에러:', error.message);
       alert('분석 중 오류가 발생했습니다: ' + error.message);
       navigate('/generatewaiting');
     }
@@ -112,7 +107,7 @@ function GenerateInput() {
       <main style={styles.main}>
         {/* 왼쪽 영역 */}
         <section style={styles.leftSection}>
-          <div style={styles.circlePlaceholder}></div>
+          {/* <div style={styles.circlePlaceholder}></div> */}
           <div style={styles.archiverBox}>
             <h2 style={styles.archiverTitle}>Archiver — {nickname}</h2>
             <p style={styles.archiverDate}>{currentDate}</p>
@@ -201,13 +196,13 @@ const styles = {
     boxSizing: 'border-box',
     overflowY: 'auto',
   },
-  circlePlaceholder: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    backgroundColor: '#eee',
-    marginBottom: '1rem',
-  },
+  // circlePlaceholder: {
+  //   width: '80px',
+  //   height: '80px',
+  //   borderRadius: '50%',
+  //   backgroundColor: '#eee',
+  //   marginBottom: '1rem',
+  // },
   archiverBox: {
     marginBottom: '2rem',
   },

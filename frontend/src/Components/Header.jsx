@@ -54,7 +54,7 @@ const styles = {
     textDecoration: 'none',
     color: '#333',
     fontSize: '1.5rem',
-    fontWeight: 'bold',
+    fontWeight: 'Regular',
   },
   nav: {
     fontFamily: 'Pretendard, sans-serif',

@@ -1,6 +1,8 @@
 // src/pages/GenerateWaiting.jsx
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
+import { getApp } from 'firebase/app';
 // import Header from '../Components/Header';
 import './GenerateWaiting.css';
 
@@ -17,39 +19,66 @@ function GenerateWaiting() {
       navigate('/generateinput');
       return;
     }
+    
+    console.log('요청 보낼 jobId:', jobId);
 
-    // 3초마다 작업 상태 generate의 status를 호출해서 작업 상태 확인 (생성 완료됐는지)
+    // generate의 status를 호출해서 작업 상태 확인 (생성 완료됐는지)
     // ready가 되면 output 페이지로 이동
-    const interval = setInterval(async () => {
-      try {
-        // status 조회
-        const response = await fetch(`/api/generate/status?jobId=${jobId}`);
-        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error('상태 조회 실패, 상태 코드: ' + response.status);
-        }
-        console.log('폴링 응답:', data);
+    // // 상태 확인을 한 번만 수행하도록 변경함
+    // fetch(`/api/generate/status?jobId=${jobId}`)
+    //     .then(async (response) => {
+    //       if (!response.ok) {
+    //         throw new Error('상태 조회 실패, 상태 코드: ' + response.status);
+    //       }
+    //       const data = await response.json();
+    //       console.log('status response:', data);
 
-        // 작업 상태가 "ready"이면 output 페이지로 이동
-        if (data.success && data.status === 'ready') {
-          // clearInterval 후 output으로
-          clearInterval(interval);
-          navigate('/generateoutput');
-        }
-        // 작업 상태가 "error"이면 input 페이지로
-        else if (data.success && data.status === 'error') {
-          clearInterval(interval);
-          alert('이미지 생성에 실패했습니다: ' + (data.errorMessage || ''));
-          navigate('/generateinput');
-        }
-        // 계속 "pending"이면 그대로 대기
-      } catch (err) {
-        console.error('폴링 에러:', err);
+    //       if (data.success && data.status === 'error') {
+    //         // 에러 상태일 때만 input 페이지로
+    //         alert('이미지 생성에 실패했습니다: ' + (data.errorMessage || ''));
+    //         navigate('/generateinput');
+    //       } else {
+    //         // ready이든 pending 이든 일단 결과 페이지로 이동
+    //         // output 컴포넌트에서 imageUrl 또는 diaries 메타를 폴링/페치하도록 처리
+    //         navigate('/generateoutput');
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.error('상태 확인 중 오류:', err);
+    //       alert('상태 확인에 실패했습니다. 네트워크를 확인해주세요.');
+    //       navigate('/generateinput');
+    //     });
+
+    // Firestore 인스턴스 가져오기
+    const db = getFirestore(getApp());
+    const jobDoc = doc(db, 'jobs', jobId);
+
+    // 실시간 리스너 등록
+    const unsubscribe = onSnapshot(jobDoc, (snapshot) => {
+      if (!snapshot.exists()) {
+        console.warn('존재하지 않는 Job 문서:', jobId);
+        return;
       }
-    }, 3000); // 3초마다 폴링
+      const { status, errorMessage } = snapshot.data();
 
-    return () => clearInterval(interval);
+      if (status === 'ready') {
+        unsubscribe();
+        navigate('/generateoutput');
+      } else if (status === 'error') {
+        unsubscribe();
+        alert('이미지 생성 error: ' + (errorMessage || ''));
+        navigate('/generateinput');
+      }
+      // status가 'pending' 이면 그냥 대기
+    }, (err) => {
+      console.error('상태:', err);
+      alert('상태 확인 실패');
+      navigate('/generateinput');
+    });
+
+    // 리스너 정리
+    return () => unsubscribe();
   }, [navigate]);
 
   return (

@@ -10,13 +10,19 @@ function GenerateOutput() {
   const [nickname, setNickname] = useState('');
   // 2) 생성된 이미지 URL
   const [imageUrl, setImageUrl] = useState(null);
-  // 3) 다이어리 메타: 프롬프트, 제목, 설명, 업데이트 날짜
+  // 3) 다이어리 메타: 프롬프트, 제목, 설명
   const [userText, setUserText] = useState('');
   const [title, setTitle] = useState('Untitled');
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState('');
+  // 4) 날짜 포맷: 줄바꿈용 3줄과 single 문자열
+  const [dateLines, setDateLines] = useState({
+    line1: '',
+    line2: '',
+    line3: '',
+    single: ''
+  });
 
-  // (A) 로그인 상태 구독 및 닉네임 세팅
+  // A) 로그인 상태 구독 및 닉네임 세팅
   // 로그인되지 않으면 /login 으로 리다이렉트
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(authService, (user) => {
@@ -29,7 +35,7 @@ function GenerateOutput() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // (B) 1차: jobId 기반으로 status 조회 → imageUrl 세팅
+  // B) jobId 기반으로 status 조회 → imageUrl 세팅 + diary 메타 조회
   // 실패 시 (/generateinput)로 리다이렉트
   useEffect(() => {
     const jobId = localStorage.getItem('jobId');
@@ -38,78 +44,79 @@ function GenerateOutput() {
       navigate('/generateinput');
       return;
     }
-    async function fetchStatus() {
-      try {
-        const res = await fetch(`/api/generate/status?jobId=${jobId}`);
-        const data = await res.json();
-        if (!data.success || data.status !== 'ready') {
-          throw new Error(data.errorMessage || '이미지 생성 중입니다.');
+
+    const fetchAll = async () => {
+      const res  = await fetch(`/api/generate/status?jobId=${jobId}`);
+      const json = await res.json();
+
+      if (!json.success) throw new Error(json.error || "상태조회 실패");
+
+      if (json.status === "ready") {
+        setImageUrl(json.imageUrl);
+
+        // diary 메타 데이터가 있으면 세팅
+        if (json.diary) {
+          const d = json.diary;
+          setUserText(d.userText || "");
+          setTitle(d.title || "Untitled");
+          setDescription(d.description || "");
+
+          // updatedAt 파싱 및 직접 포맷팅
+          if (d.updatedAt) {
+            // Firestore Timestamp이 _seconds/_nanoseconds로 오는 경우 처리
+            const secs = d.updatedAt.seconds ?? d.updatedAt._seconds;
+            const dt = secs
+              ? new Date(secs * 1000)
+              : (typeof d.updatedAt === "string"
+                  ? new Date(d.updatedAt)
+                  : (d.updatedAt.toDate
+                      ? d.updatedAt.toDate()
+                      : new Date(d.updatedAt)));
+
+            // 유효한 날짜인지 확인
+            if (!isNaN(dt.getTime())) {
+              // 직접 포맷팅
+              const monthNames = [
+                "January","February","March","April","May","June",
+                "July","August","September","October","November","December"
+              ];
+              const month = monthNames[dt.getMonth()];
+              const day   = dt.getDate();
+              const year  = dt.getFullYear();
+              let   hr    = dt.getHours();
+              // const hr    = dt.getHours();
+              const min   = dt.getMinutes().toString().padStart(2, '0');
+              const ampm  = hr >= 12 ? "PM" : "AM";
+              hr = hr % 12 || 12;
+
+              // 줄바꿈 3줄용과 single용 문자열 생성
+              setDateLines({
+                line1: `${month} ${day}`,
+                line2: `${year}`,
+                line3: `${hr}:${min} ${ampm}`,
+                single: `${month} ${day}, ${year}, ${hr}:${min} ${ampm}`
+              });
+            } else {
+              console.warn("유효하지 않은 일자:", d.updatedAt);
+            }
+          }
         }
-        setImageUrl(data.imageUrl);
-      } catch (err) {
-        console.error('Status 조회 오류:', err);
+      } else if (json.status === "error") {
+        alert("실패: " + (json.errorMessage || ""));
         navigate('/generateinput');
+      } else {
+        // pending 이면 2초 후 재시도
+        setTimeout(fetchAll, 2000);
       }
-    }
-    fetchStatus();
+    };
+
+    fetchAll().catch(err => {
+      console.error(err);
+      navigate('/generateinput');
+    });
   }, [navigate]);
 
-  // (C) imageUrl 세팅 후 2차: diaries 메타(userText/title/description/date) 조회
-  // Firestore 문서에 success 필드가 없으므로, 바로 필드를 읽어옵니다
-  useEffect(() => {
-    if (!imageUrl) return;
-
-    const jobId = localStorage.getItem('jobId');
-    async function fetchDiary() {
-      try {
-        const res = await fetch(`/api/diaries/${jobId}`);
-        if (!res.ok) {
-          console.warn('Diary 메타 로드 실패 (상태:', res.status, ')');
-          return;
-        }
-        const diary = await res.json();
-        if (!diary) {
-          console.warn('diary 문서가 비어있습니다.');
-          return;
-        }
-        // userText 설정
-        if (diary.userText) {
-          setUserText(diary.userText);
-        }
-        // title 설정
-        if (diary.title) {
-          setTitle(diary.title);
-        }
-        // description 설정 (없으면 플레이스홀더)
-        if (diary.description) {
-          setDescription(diary.description);
-        } else {
-          setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
-        }
-        // date 설정
-        if (diary.updatedAt) {
-          const ts = diary.updatedAt.seconds
-            ? diary.updatedAt.seconds * 1000
-            : diary.updatedAt;
-          const d = new Date(ts);
-          setDate(
-            d.toLocaleString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit'
-            })
-          );
-        }
-      } catch (err) {
-        console.error('Diary 메타 조회 오류:', err);
-      }
-    }
-    fetchDiary();
-  }, [imageUrl]);
-
-  // (D) 로딩 상태: imageUrl 아직 세팅되지 않음
+  // D) 로딩 상태: imageUrl 아직 세팅되지 않음
   if (!imageUrl) {
     return (
       <div style={styles.loading}>
@@ -118,173 +125,189 @@ function GenerateOutput() {
     );
   }
 
-  // (E) 렌더링: 좌측 텍스트, 우측 이미지
+  // E) 렌더링: 좌측 텍스트, 우측 이미지
   return (
     <div style={styles.container}>
-      {/* 좌우 50:50 레이아웃 */}
-      <div style={styles.content}>
-        {/* 좌측: 텍스트 영역 */}
-        <div style={styles.leftPane}>
-          {/* 1) Prompt */}
-          <div style={styles.promptBlock}>
-            <p>{userText}</p>
-          </div>
+      <div style={styles.leftPane}>
+        {/* 1) userText */}
+        <div style={styles.promptBlock}>
+          <p style={styles.promptText}>{userText}</p>
+        </div>
 
-          {/* 2) Nickname + Date */}
-          <div style={styles.userInfoRow}>
-            <div style={styles.nicknameText}>
-              Archiver —<br />{nickname}
-            </div>
-            <div style={styles.dateText}>
-              {date.split(', ').map((part, i) => (
-                <React.Fragment key={i}>
-                  {part}
-                  <br />
-                </React.Fragment>
-              ))}
-            </div>
+        {/* 2) Archiver + Date */}
+        <div style={styles.userInfoRow}>
+          <div style={styles.nicknameText}>
+            Archiver —<br />{nickname}
           </div>
-
-          {/* 3) Diary Title */}
-          <div style={styles.titleBlock}>
-            <div style={styles.titleText}>{title}</div>
-          </div>
-
-          {/* 4) Description */}
-          <div style={styles.descriptionBlock}>
-            <p style={styles.descriptionText}>{description}</p>
+          <div style={styles.dateText}>
+            {dateLines.line1},<br/>
+            {dateLines.line2},<br/>
+            {dateLines.line3}
           </div>
         </div>
 
-        {/* 우측: 이미지 영역 */}
-        <div style={styles.rightPane}>
-          <img src={imageUrl} alt="Generated" style={styles.image} />
+        {/* 3) Title */}
+        <div style={styles.titleBlock}>
+          <div style={styles.titleText}>{title}</div>
         </div>
+
+        {/* 4) By + nickname */}
+        <p style={styles.byText}>By {nickname}</p>
+
+        {/* 5) On + date */}
+        <p style={styles.onText}>On {dateLines.single}</p>
+
+        {/* 6) Description */}
+        <div style={styles.descriptionBlock}>
+          <p style={styles.descriptionText}>{description}</p>
+        </div>
+      </div>
+
+      {/* 우측 이미지 */}
+      <div style= {{...styles.rightPane, backgroundImage: `url(${imageUrl})`}}>
       </div>
     </div>
   );
 }
 
 const styles = {
-  // 컨테이너: 헤더 제외, 본문만 담당
   container: {
     display: 'flex',
-    flex: 1
+    height: '100vh',
+    fontFamily: 'Pretendard, sans-serif'
   },
-  content: {
+  loading: {
     display: 'flex',
-    flex: 1
+    height: '100vh',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: 'Pretendard, sans-serif'
   },
 
-  // 좌측 패널 (50%)
   leftPane: {
     width: '50%',
+    flex: 1,
     padding: '32px',
-    boxSizing: 'border-box',
+    marginRight: '80px',
+    boxSizing: 'border-box',  // rightPane과 80px 띄우기
     display: 'flex',
     flexDirection: 'column'
   },
 
-  // 1) Prompt
+  // 1) userText
   promptBlock: {
-    width: '351px',
+    marginTop: '100px',
+    alignSelf: 'flex-end',
+    width: '500px',
     maxHeight: '140px',
     overflow: 'hidden',
-    color: 'var(--neutral-neutral-1-main-text, #383325)',
+    marginBottom: '60px'
+  },
+  promptText: {
+    fontSize: '18px',
+    fontWeight: 500,
+    lineHeight: '24px',
     textAlign: 'right',
-    fontFamily: 'Pretendard, sans-serif',
-    fontSize: '16px',
-    fontStyle: 'normal',
-    fontWeight: 400,
-    lineHeight: '16px',
-    letterSpacing: '-1px',
-    textTransform: 'capitalize',
-    marginBottom: '30px',
-    marginRight: '80px'
+    color: 'var(--neutral-neutral-1-main-text, #555555)'
   },
 
-  // 2) Nickname + Date
+  // 2) Archiver + Date
   userInfoRow: {
     display: 'flex',
-    justifyContent: 'space-between',
-    gap: '200px',
+    justifyContent: 'flex-end', // 오른쪽 정렬
+    gap: '360px', // 둘 사이의 갭
     marginBottom: '80px'
   },
   nicknameText: {
-    fontFamily: 'Pretendard, sans-serif',
-    fontSize: '32px',
-    fontStyle: 'normal',
-    fontWeight: 600,
-    lineHeight: '32px',
-    color: 'var(--neutral-neutral-1-main-text, #383325)'
+    whiteSpace: 'pre-line',
+    fontSize: '36px',
+    fontWeight: 700,
+    lineHeight: '40px',
+    color: 'var(--neutral-neutral-1-main-text, #222222)'
   },
   dateText: {
-    fontFamily: 'Pretendard, sans-serif',
-    fontSize: '32px',
-    fontStyle: 'normal',
-    fontWeight: 600,
-    lineHeight: '32px',
+    whiteSpace: 'pre-line',
+    fontSize: '36px',
+    fontWeight: 700,
+    lineHeight: '48px',
     textAlign: 'right',
-    color: 'var(--neutral-neutral-1-main-text, #383325)'
+    color: 'var(--neutral-neutral-1-main-text, #222222)'
   },
 
   // 3) Diary Title
   titleBlock: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginTop: '300px',
-    marginBottom: '80px'
+    marginTop: '40px',
+    marginBottom: '24px'
   },
   titleText: {
-    color: 'var(--neutral-neutral-1-main-text, #383325)',
-    textAlign: 'right',
-    fontFamily: 'Pretendard, sans-serif',
     fontSize: '32px',
-    fontStyle: 'normal',
-    fontWeight: 500,
+    fontWeight: 600,
     lineHeight: '24px',
-    textTransform: 'capitalize'
+    textAlign: 'right',
+    color: 'var(--neutral-neutral-1-main-text, #222222)'
   },
 
-  // 4) Description
+  // 4) By
+  byText: {
+    margin: 0,
+    fontSize: '16px',
+    fontWeight: 500,
+    textAlign: 'right',
+    color: '#777',
+    marginBottom: '4px'
+  },
+  // 5) On
+  onText: {
+    margin: 0,
+    fontSize: '16px',
+    fontWeight: 500,
+    textAlign: 'right',
+    color: '#777',
+    marginBottom: '24px'
+  },
+
+  // 6) Description
   descriptionBlock: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginTop: '80px',
-    marginRight: '80px'
+    width: '700px',          // 고정 너비
+    alignSelf: 'flex-end',   // 오른쪽 끝 정렬
+    maxHeight: '200px',
+    overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
+    marginBottom: '100px'    // 아래 여백
   },
   descriptionText: {
-    color: 'var(--neutral-neutral-1-main-text, #383325)',
-    textAlign: 'right',
-    fontFamily: 'Pretendard, sans-serif',
     fontSize: '16px',
-    fontStyle: 'normal',
-    fontWeight: 400,
+    fontWeight: 500,
     lineHeight: '24px',
-    textTransform: 'capitalize'
+    textAlign: 'right',
+    color: 'var(--neutral-neutral-1-main-text, #555)'
   },
 
-  // 우측 패널 (50%)
+  // 우측 이미지
   rightPane: {
-    width: '50%',
-    background: '#fafafa',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  image: {
-    maxWidth: '100%',
-    maxHeight: '100%',
-    objectFit: 'contain'
-  },
-
-  // 로딩 상태
-  loading: {
-    display: 'flex',
-    height: '100vh',
-    alignItems: 'center',
-    justifyContent: 'center'
+    width: '50%',      // 부모 container의 50%
+    height: '100vh',     // 화면 높이 꽉 채우기
+    backgroundSize: 'cover',       // 영역 꽉 채우며 잘라내기
+    backgroundPosition: 'center',  // 중앙 기준 크롭
+    backgroundRepeat: 'no-repeat'  // 반복 금지
+    // overflow: 'hidden',  // 넘치는 부분 잘라내기
+    // display: 'flex',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // position: 'relative', // 절대 위치로 꽉 채워야겠음
+    // background: '#ffffff'
   }
+  // image: {
+  //   position: 'absolute',
+  //   top: 0,
+  //   left: 0,
+  //   height: '100%',      // 항상 부모 높이(100vh) 꽉 채우기
+  //   width: 'auto',       // 원본 비율 유지하면서
+  //   minWidth: '100%',    // 가로는 최소 부모 폭(800px) 이상 보장
+  //   objectFit: 'cover',  // 넘치는 부분은 잘라내기
+  //   objectPosition: 'center center'  // 중앙 기준으로 크롭
+  // }
 };
 
 export default GenerateOutput;
