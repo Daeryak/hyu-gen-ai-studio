@@ -160,7 +160,7 @@ function GenerateInput() {
             />
           </div> */}
           <div style={styles.emotionKindsBox}>
-            <p style={styles.emotionKindsLabel}>감정 종류:</p>
+            {/* <p style={styles.emotionKindsLabel}></p> */}
             <div style={styles.emotionKindsList}>
               {emotionKinds.map((kind) => (
                 <label key={kind} style={styles.checkboxLabel}>
@@ -186,7 +186,7 @@ function GenerateInput() {
             </h3>
             <textarea
               style={styles.textArea}
-              placeholder="1500자 이내 자유 서술..."
+              placeholder="오늘 있었던 일이나 인상적이었던 기억, 혹은 지금 느껴지는 감정이나 생각을 말해주세요. 어떤 내용이라도 감정을 분석해드릴 수 있어요."
               maxLength={1500}
               value={userText}
               onChange={(e) => setUserText(e.target.value)}
@@ -230,6 +230,7 @@ const styles = {
     overflowY: 'auto',
   },
   rightSection: {
+    position: 'relative',
     flex: 1,
     padding: '2rem',
     boxSizing: 'border-box',
@@ -242,11 +243,14 @@ const styles = {
   //   backgroundColor: '#eee',
   //   marginBottom: '1rem',
   // },
+
+  // =============================================================
+  // archiver 선택하는 파트
   archiverBox: {
     // marginBottom: '2rem',
     position: 'absolute',
-    top: '170px',
-    left: '100px',
+    top: '160px',
+    left: '250px',
     display: 'flex',             // flex 컨테이너로 만들어서
     alignItems: 'baseline',      // 글자 기준선 맞추기
     gap: '200px',                // 제목과 날짜 간격
@@ -256,7 +260,7 @@ const styles = {
     fontSize: '32px',
     fontFamily: 'Work Sans, sans-serif',
     fontWeight: 600,
-    lineHeight: '31.5px',
+    lineHeight: '35px',
     wordWrap: 'break-word',
     margin: 0,
   },
@@ -266,14 +270,17 @@ const styles = {
     fontSize: '32px',
     fontFamily: 'Work Sans, sans-serif',
     fontWeight: 600,
-    lineHeight: '31.5px',
+    lineHeight: '35px',
     wordWrap: 'break-word',
   },
+
+  // =============================================================
+  //감정 강도 선택하는 파트
   emotionLevelBox: {
     // marginBottom: '2rem',
     position: 'absolute',
     top: '270px',   // 참고로 archiverBox(top:170px)
-    left: '100px',  // archiverBox와 동일한 left 값
+    left: '250px',  // archiverBox와 동일한 left 값
     width: '600px', // 위의 날짜와 대강 오른쪽 끝 맞추기
     fontsize: '32px',
   },
@@ -328,11 +335,14 @@ const styles = {
   //   width: '100%',
   //   marginBottom: '0.5rem',
   // },
+
+  // =============================================================
+  // 감정 종류 선택
   emotionKindsBox: {
     // marginBottom: '2rem',
     position: 'absolute',
     top: '400px',   // 참고로 archiverBox(top:170px)
-    left: '100px',  // archiverBox와 동일한 left 값
+    left: '250px',  // archiverBox와 동일한 left 값
     width: '600px', // 위의 날짜와 대강 오른쪽 끝 맞추기
   },
   emotionKindsLabel: {
@@ -353,33 +363,61 @@ const styles = {
   checkboxInput: {
     cursor: 'pointer',
   },
+
+  // =============================================================
+  // 우측에 하루 느낌 입력하는 파트
   textBox: {
-    marginBottom: '2rem',
+    position: 'absolute',
+    top: '60px',
+    right: '250px',
+    // marginBottom: '2rem',
   },
   textBoxTitle: {
     fontSize: '1rem',
     marginBottom: '0.5rem',
+    fontSize: '22px',
     fontWeight: 600,
+    color: '#383325',
+    lineHeight: '32px',
   },
   textArea: {
-    width: '100%',
-    height: '200px',
+    width: '600px',
+    height: '480px',
     resize: 'vertical',
-    fontSize: '0.95rem',
+    fontSize: '16px',
     padding: '0.5rem',
     boxSizing: 'border-box',
+    borderRadius: '25.2px',
+    color: '#9e9e9e',
+    padding: '25px',
   },
   analyzeBox: {
     textAlign: 'right',
+    // display: 'flex',
+    // justifyContent: 'flex-end',
+    // marginTop: '25px',     // 텍스트박스와 버튼 사이 간격
   },
   analyzeButton: {
-    padding: '0.6rem 1.2rem',
-    fontSize: '1rem',
-    backgroundColor: '#000',
-    color: '#fff',
+    // display: 'inline-flex',
+    position: 'absolute',
+    right: '250px',
+    top: '673px',
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '7.23px 38.55px',            // 위/아래 7.23, 좌/우 38.55
+    background: 'linear-gradient(270deg, #C9E5FF 6%, #FFF2BE 100%)',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '25.2px',
     cursor: 'pointer',
+    /* 텍스트 스타일 */
+    fontFamily: 'Pretendard, sans-serif',
+    fontSize: '24px',
+    fontWeight: 600,
+    lineHeight: '24px',
+    color: '#383325',
+    textTransform: 'none',
+    gap: '9.64px',                        // 텍스트와 화살표 사이 간격
   },
 };
 
