@@ -93,7 +93,7 @@ function GenerateWaiting() {
       <main style={styles.main}>
         <h1 style={styles.title}>당신의 마음을 그려내고 있어요..</h1>
         <p style={styles.description}>
-          마음을 천천히 관찰하는 중이에요.<br />
+          당신의 마음을 세세하게 관찰하는 중이에요.<br />
           3-4분 정도 걸릴 수 있으니 잠시만 기다려주세요.
         </p>
       </main>

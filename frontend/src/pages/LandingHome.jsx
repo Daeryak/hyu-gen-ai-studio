@@ -107,7 +107,7 @@ const styles = {
     width: `${(LEFT_RATIO / TOTAL_RATIO) * 100}%`, // 약 47%
     backgroundColor: '#fcfdff',
     boxSizing: 'border-box',
-    overflowY: 'auto',
+    // overflowY: 'auto',
     padding: '3rem 0 7rem 2rem', // 상단 3rem, 우측 0, 하단 7rem (약 112px), 좌측 2rem
     position: 'relative',
   },
@@ -115,7 +115,7 @@ const styles = {
     fontSize: '3rem',         // 글자 크기 증가
     lineHeight: 1.6,
     margin: 0,
-    marginTop: '40px',        // 약간 아래로 내림
+    marginTop: '25px',        // 약간 아래로 내림
     marginLeft: '100px',      // 좌측 여백 100px
     marginBottom: '1rem',
     color: '#383325',

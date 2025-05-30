@@ -369,11 +369,11 @@ const styles = {
   textBox: {
     position: 'absolute',
     top: '60px',
-    right: '250px',
+    right: '230px',
     // marginBottom: '2rem',
   },
   textBoxTitle: {
-    fontSize: '1rem',
+    // fontSize: '1rem',
     marginBottom: '0.5rem',
     fontSize: '22px',
     fontWeight: 600,
@@ -381,6 +381,7 @@ const styles = {
     lineHeight: '32px',
   },
   textArea: {
+    marginTop: '0.2rem',
     width: '600px',
     height: '480px',
     resize: 'vertical',
@@ -400,7 +401,7 @@ const styles = {
   analyzeButton: {
     // display: 'inline-flex',
     position: 'absolute',
-    right: '250px',
+    right: '230px',
     top: '673px',
     height: 80,
     alignItems: 'center',
