@@ -36,9 +36,9 @@ function LandingHome() {
       <div style={styles.mainArea}>
         <div style={styles.leftSection}>
           <h1 style={styles.title}>
-            당신의 하루를<br />
+            당신의 마음을<br />
             색과 결의 형태로<br />
-            기록해 드립니다
+            기록해 드릴게요
           </h1>
 
           {/* 서브텍스트 박스 */}
@@ -54,9 +54,15 @@ function LandingHome() {
             </p>
           </div>
 
-          <button style={styles.startButton} onClick={handleStartClick}>
+          {/* <button style={styles.startButton} onClick={handleStartClick}>
             지금 시작하기
-          </button>
+          </button> */}
+          <div style={styles.startWrapper} onClick={handleStartClick}>
+            {/* 1) 버튼 텍스트 */}
+            <span style={styles.startText}>지금 시작하기</span>
+            {/* 2) 절대 위치 언더라인 */}
+            <div style={styles.startUnderline} />
+          </div>
         </div>
       </div>
     </div>
@@ -76,7 +82,7 @@ const styles = {
     padding: 0,
     fontFamily: 'Pretendard, sans-serif',
     letterSpacing: '-0.02em',
-    backgroundColor: '#fff',
+    backgroundColor: '#fcfdff',
     overflow: 'hidden',
   },
   // bgImage: {
@@ -99,7 +105,7 @@ const styles = {
   },
   leftSection: {
     width: `${(LEFT_RATIO / TOTAL_RATIO) * 100}%`, // 약 47%
-    backgroundColor: '#fff',
+    backgroundColor: '#fcfdff',
     boxSizing: 'border-box',
     overflowY: 'auto',
     padding: '3rem 0 7rem 2rem', // 상단 3rem, 우측 0, 하단 7rem (약 112px), 좌측 2rem
@@ -112,7 +118,7 @@ const styles = {
     marginTop: '40px',        // 약간 아래로 내림
     marginLeft: '100px',      // 좌측 여백 100px
     marginBottom: '1rem',
-    color: '#222',
+    color: '#383325',
     fontWeight: 700,
   },
   subtitleBox: {
@@ -122,24 +128,54 @@ const styles = {
   },
   subtitle: {
     fontSize: '1.12rem',      // 글자 크기 증가
-    color: '#555',
+    fontWeight: 500,
+    color: '#383325',
     lineHeight: 1.8,
     margin: 0,
     marginBottom: '1rem',     // 문단 간 간격
   },
-  startButton: {
+  // startButton: {
+  //   display: 'block',
+  //   marginTop: '2rem',
+  //   marginRight: '80px',      // 오른쪽 여백 80px
+  //   marginLeft: 'auto',       // 오른쪽 정렬 효과
+  //   padding: '0.8rem 1.5rem',
+  //   fontSize: '1.25rem',      // 버튼 폰트 크기 증가
+  //   backgroundColor: '#000',
+  //   color: '#fff',
+  //   border: 'none',
+  //   borderRadius: '4px',
+  //   cursor: 'pointer',
+  startWrapper: {
+    position: 'relative',     // 텍스트/언더라인 absolute 기준
     display: 'block',
-    marginTop: '2rem',
-    marginRight: '80px',      // 오른쪽 여백 80px
-    marginLeft: 'auto',       // 오른쪽 정렬 효과
-    padding: '0.8rem 1.5rem',
-    fontSize: '1.25rem',      // 버튼 폰트 크기 증가
-    backgroundColor: '#000',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
+    marginTop: '2rem',        // 기존 startButton.marginTop
+    marginLeft: 'auto',       // 기존 startButton 우측 정렬
+    marginRight: '80px',      // 기존 startButton.marginRight
     cursor: 'pointer',
+    width: 210,            // 언더라인 길이와 동일하게 고정
+    height: 70,               // 텍스트 + 언더 여유 공간
   },
+  startText: {
+    position: 'absolute',
+    top: 11,                  // 디자인 기준 Y 위치
+    left: 30,                 // 디자인 기준 X 위치
+    color: '#383325',
+    fontSize: 32,
+    fontFamily: 'Pretendard, sans-serif',
+    fontWeight: 500,
+    lineHeight: '24px',
+    textAlign: 'right',
+  },
+  startUnderline: {
+    position: 'absolute',
+    top: 45,                // 텍스트 baseline + lineHeight + 여유
+    left: 30,
+    width: 170,
+    height: 0,
+    outline: '2px solid #383325',
+    outlineOffset: '-1px'
+  }
 };
 
 export default LandingHome;

@@ -21,8 +21,10 @@ function GenerateInput() {
     });
     return () => unsubscribe();
   }, []);
-  // 현재 날짜 (로컬 시간 사용)
-  const [currentDate, setCurrentDate] = useState('');
+  // 현재 날짜 (로컬 시간 사용) - 퍼블리싱 때문에 좀 바꿈
+  // const [currentDate, setCurrentDate] = useState('');  
+  const [monthDay, setMonthDay] = useState('');
+  const [year, setYear] = useState('');
   // 감정 강도
   const [emotionLevel, setEmotionLevel] = useState(50);
   // 감정 종류 (멀티 선택 가능)
@@ -33,9 +35,15 @@ function GenerateInput() {
   // 컴포넌트 마운트 시 현재 날짜 초기화
   useEffect(() => {
     const now = new Date();
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const formattedDate = now.toLocaleDateString('en-US', options);
-    setCurrentDate(formattedDate);
+    // const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    // const formattedDate = now.toLocaleDateString('en-US', options);
+    // setCurrentDate(formattedDate);
+    // "May 31"
+    const md = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+    // "2025"
+    const yr = now.getFullYear().toString();
+    setMonthDay(md);
+    setYear(yr);
   }, []);
 
   // 감정 종류 체크박스 클릭 핸들러
@@ -109,12 +117,40 @@ function GenerateInput() {
         <section style={styles.leftSection}>
           {/* <div style={styles.circlePlaceholder}></div> */}
           <div style={styles.archiverBox}>
-            <h2 style={styles.archiverTitle}>Archiver — {nickname}</h2>
-            <p style={styles.archiverDate}>{currentDate}</p>
+            <h2 style={styles.archiverTitle}>Archiver —<br />{nickname}</h2>
+            {/* <p style={styles.archiverDate}>{currentDate}</p> */}
+            <p style={styles.archiverDate}>{monthDay},<br/>{year}'</p>
           </div>
           <div style={styles.emotionLevelBox}>
-            <label style={styles.emotionLevelLabel}>감정 강도: {emotionLevel}</label>
-            <input
+            <label style={styles.emotionLevelLabel}>감정의 강도: {emotionLevel}</label>
+              {/* 트랙 전체 */}
+              <div style={styles.sliderTrack}>
+                {/* 채워진 부분 */}
+                <div
+                  style={{
+                    ...styles.sliderFill,
+                    width: `${emotionLevel}%`  // 퍼센트 만큼만 채움
+                  }}
+                />
+
+                {/* 투명한 실제 슬라이더(thumb만 보이도록) */}
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={emotionLevel}
+                  onChange={e => setEmotionLevel(e.target.value)}
+                  style={styles.sliderInput}
+                />
+              </div>
+
+              {/* 약해요/강해요 레이블 */}
+              <div style={styles.rangeLabels}>
+                <span>약해요</span>
+                <span>강해요</span>
+              </div>
+            </div>
+            {/* <input
               type="range"
               min="0"
               max="100"
@@ -122,7 +158,7 @@ function GenerateInput() {
               onChange={(e) => setEmotionLevel(e.target.value)}
               style={styles.rangeInput}
             />
-          </div>
+          </div> */}
           <div style={styles.emotionKindsBox}>
             <p style={styles.emotionKindsLabel}>감정 종류:</p>
             <div style={styles.emotionKindsList}>
@@ -144,7 +180,10 @@ function GenerateInput() {
         {/* 오른쪽 영역 */}
         <section style={styles.rightSection}>
           <div style={styles.textBox}>
-            <h3 style={styles.textBoxTitle}>지금 기분이 어떠신가요?</h3>
+            <h3 style={styles.textBoxTitle}>
+              모든 마음을 환영하니,<br />
+              떠오르는대로 편하게 털어놔 주세요.
+            </h3>
             <textarea
               style={styles.textArea}
               placeholder="1500자 이내 자유 서술..."
@@ -172,7 +211,7 @@ const styles = {
     minHeight: '100vh',
     fontFamily: 'Pretendard, sans-serif',
     letterSpacing: '-0.02em',
-    backgroundColor: '#fff',
+    backgroundColor: '#fcfdff',
     margin: 0,
     padding: '0 6rem',
     overflow: 'hidden',
@@ -185,7 +224,7 @@ const styles = {
   },
   leftSection: {
     flex: 1,
-    borderRight: '1px solid #eee',
+    // borderRight: '1px solid #eee',
     padding: '2rem',
     boxSizing: 'border-box',
     overflowY: 'auto',
@@ -194,7 +233,7 @@ const styles = {
     flex: 1,
     padding: '2rem',
     boxSizing: 'border-box',
-    overflowY: 'auto',
+    // overflowY: 'auto',
   },
   // circlePlaceholder: {
   //   width: '80px',
@@ -204,33 +243,97 @@ const styles = {
   //   marginBottom: '1rem',
   // },
   archiverBox: {
-    marginBottom: '2rem',
+    // marginBottom: '2rem',
+    position: 'absolute',
+    top: '170px',
+    left: '100px',
+    display: 'flex',             // flex 컨테이너로 만들어서
+    alignItems: 'baseline',      // 글자 기준선 맞추기
+    gap: '200px',                // 제목과 날짜 간격
   },
   archiverTitle: {
-    fontSize: '1.2rem',
+    color: '#383325',
+    fontSize: '32px',
+    fontFamily: 'Work Sans, sans-serif',
     fontWeight: 600,
+    lineHeight: '31.5px',
+    wordWrap: 'break-word',
     margin: 0,
-    marginBottom: '0.3rem',
   },
   archiverDate: {
-    margin: 0,
-    fontSize: '0.9rem',
-    color: '#666',
+    margin: 0,                   // 상단 여백은 archiverBox에서
+    color: '#383325',
+    fontSize: '32px',
+    fontFamily: 'Work Sans, sans-serif',
+    fontWeight: 600,
+    lineHeight: '31.5px',
+    wordWrap: 'break-word',
   },
   emotionLevelBox: {
-    marginBottom: '2rem',
+    // marginBottom: '2rem',
+    position: 'absolute',
+    top: '270px',   // 참고로 archiverBox(top:170px)
+    left: '100px',  // archiverBox와 동일한 left 값
+    width: '600px', // 위의 날짜와 대강 오른쪽 끝 맞추기
+    fontsize: '32px',
   },
   emotionLevelLabel: {
-    display: 'block',
+    display: 'block', 
     marginBottom: '0.3rem',
     fontWeight: 500,
+    fontSize: '22px',
+    color: '#828282'
   },
-  rangeInput: {
+  // 슬라이더 트랙 전체 (회색 배경)
+  sliderTrack: {
+    position: 'relative',
+    top: '8px',
     width: '100%',
-    marginBottom: '0.5rem',
+    height: '16px',
+    background: '#EBEBEB',
+    borderRadius: '22px',
+    overflow: 'hidden',
   },
+  // 채워진 부분 (그라데이션)
+  sliderFill: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    height: '100%',
+    background: 'linear-gradient(270deg, #C9E5FF 6%, #FFF2BE 100%)',
+    borderRadius: '22px',
+  },
+  // 실제 드래그 영역 (input thumb은 index.css에서 아예 안보이도록 투명처리하는 코드 갖고왔음)
+  sliderInput: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: '100%',
+    height: '100%',
+    background: 'transparent',
+    WebkitAppearance: 'none',
+    appearance: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+  },
+  // 슬라이더 밑 레이블 “약해요 / 강해요”
+  rangeLabels: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '20px',
+    fontSize: '0.9rem',
+    color: '#999',
+  },
+  // rangeInput: {
+  //   width: '100%',
+  //   marginBottom: '0.5rem',
+  // },
   emotionKindsBox: {
-    marginBottom: '2rem',
+    // marginBottom: '2rem',
+    position: 'absolute',
+    top: '400px',   // 참고로 archiverBox(top:170px)
+    left: '100px',  // archiverBox와 동일한 left 값
+    width: '600px', // 위의 날짜와 대강 오른쪽 끝 맞추기
   },
   emotionKindsLabel: {
     marginBottom: '0.5rem',

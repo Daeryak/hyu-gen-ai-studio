@@ -185,6 +185,7 @@ const styles = {
   },
 
   leftPane: {
+    BackgroundColor: '#fcfdff',
     width: '50%',
     flex: 1,
     padding: '32px',
@@ -200,6 +201,7 @@ const styles = {
     alignSelf: 'flex-end',
     width: '500px',
     maxHeight: '140px',
+    overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
     overflow: 'hidden',
     marginBottom: '60px'
   },
@@ -223,7 +225,7 @@ const styles = {
     fontSize: '36px',
     fontWeight: 700,
     lineHeight: '40px',
-    color: 'var(--neutral-neutral-1-main-text, #222222)'
+    color: 'var(--neutral-neutral-1-main-text, #383325)'
   },
   dateText: {
     whiteSpace: 'pre-line',
@@ -231,7 +233,7 @@ const styles = {
     fontWeight: 700,
     lineHeight: '48px',
     textAlign: 'right',
-    color: 'var(--neutral-neutral-1-main-text, #222222)'
+    color: 'var(--neutral-neutral-1-main-text, #383325)'
   },
 
   // 3) Diary Title
@@ -246,7 +248,7 @@ const styles = {
     fontWeight: 600,
     lineHeight: '24px',
     textAlign: 'right',
-    color: 'var(--neutral-neutral-1-main-text, #222222)'
+    color: 'var(--neutral-neutral-1-main-text, #383325)'
   },
 
   // 4) By

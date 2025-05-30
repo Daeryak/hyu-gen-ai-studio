@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import Header from '../Components/Header';
 import './GenerateLanding.css';
@@ -6,9 +6,19 @@ import './GenerateLanding.css';
 function GenerateLanding() {
   const navigate = useNavigate();
 
-  const handleStartClick = () => {
-    navigate('/generateinput');
-  };
+  // 마운트 시 2초 뒤 자동 이동
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate('/generateinput');
+    }, 2000);
+
+  // 언마운트 시 타이머 해제
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
+  // const handleStartClick = () => {
+  //   navigate('/generateinput');
+  // };
 
   return (
     <div style={styles.container}>
@@ -38,9 +48,6 @@ function GenerateLanding() {
           무엇이든 편하게 말해 주세요.<br />
           어려울 것 없어요, 모든 이야기를 환영합니다.
         </p>
-        <button style={styles.startButton} onClick={handleStartClick}>
-          시작할래요!
-        </button>
       </main>
     </div>
   );
@@ -57,7 +64,7 @@ const styles = {
     fontFamily: 'Pretendard, sans-serif',
     letterSpacing: '-0.02em',
     overflow: 'hidden',
-    backgroundColor: '#fdfdfd',
+    backgroundColor: '#fcfdff',
   },
   main: {
     position: 'relative',
@@ -73,23 +80,23 @@ const styles = {
   title: {
     fontSize: '2.5rem',
     marginBottom: '1rem',
-    color: '#333',
+    color: '#383325',
   },
   description: {
     fontSize: '1.3rem',
-    color: '#555',
+    color: '#383325',
     lineHeight: 1.6,
     marginBottom: '2rem',
   },
-  startButton: {
-    backgroundColor: '#000',
-    color: '#fff',
-    padding: '0.8rem 1.5rem',
-    fontSize: '1.1rem',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
+  // startButton: {
+  //   backgroundColor: '#000',
+  //   color: '#fff',
+  //   padding: '0.8rem 1.5rem',
+  //   fontSize: '1.1rem',
+  //   border: 'none',
+  //   borderRadius: '4px',
+  //   cursor: 'pointer',
+  // },
 };
 
 export default GenerateLanding;

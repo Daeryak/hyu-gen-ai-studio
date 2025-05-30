@@ -52,7 +52,7 @@ const styles = {
   logoLink: {
     fontFamily: 'MuseoModerno',
     textDecoration: 'none',
-    color: '#333',
+    color: '#383325',
     fontSize: '1.5rem',
     fontWeight: 'Regular',
   },
@@ -64,13 +64,13 @@ const styles = {
   },
   navLink: {
     textDecoration: 'none',
-    color: '#333',
+    color: '#383325',
     fontWeight: 500,
   },
   authButton: {
     backgroundColor: 'transparent',
     border: 'none',
-    color: '#333',
+    color: '#383325',
     fontWeight: 500,
     fontSize: '1rem',
     cursor: 'pointer',

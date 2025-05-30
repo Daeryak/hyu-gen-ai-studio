@@ -94,6 +94,28 @@ async function retryWithBackoff(fn, args, retries = 3, delay = 1000) {
   }
 }
 
+
+// GPT 응답 문자열(raw)에서 코드 펜스나 언어 태그를 제거, 중괄호로 둘러싸인 JSON 부분만 반환
+function cleanJsonString(raw) {
+  let s = raw.trim();
+
+  // ```json …``` 코드 펜스 제거
+  s = s.replace(/```json\s*/i, "")
+       .replace(/```[\s\S]*$/i, "")
+       .trim();
+
+  // 언어 태그 없는 ``` … ``` 펜스 제거
+  if (s.startsWith("```")) {
+    s = s.replace(/^```/, "").replace(/```$/, "").trim();
+  }
+
+  // 가장 바깥 중괄호만 추출
+  const m = s.match(/\{[\s\S]*\}$/);
+  if (m) s = m[0];
+
+  return s;
+}
+
 // GPT 호출 함수 1) userText -> prompt1 생성
 async function callOpenAIForPrompt1(userText) {
   const { Configuration, OpenAIApi } = require("openai");
@@ -131,8 +153,24 @@ Return ONLY valid JSON, without any markdown or code fences.
     }]
   );
 
-  const content = resp.data.choices[0].message.content.trim();
-  const json    = JSON.parse(content);
+  // const content = resp.data.choices[0].message.content.trim();
+  // const json    = JSON.parse(content);
+  // const raw     = resp.data.choices[0].message.content;
+  // const clean   = cleanJsonString(raw);
+  // const json    = JSON.parse(clean);
+  // return json.prompt;
+  
+  // RAW 응답을 클린업한 뒤 파싱
+  const raw     = resp.data.choices[0].message.content;
+  const clean   = cleanJsonString(raw);
+  let json;
+  try {
+    json = JSON.parse(clean);
+  } catch (e) {
+    console.error("Prompt1 JSON 파싱 오류:", { raw, clean, err:e });
+    throw new Error("Prompt1 파싱 실패");
+  }
+
   return json.prompt;
 }
 
@@ -219,8 +257,33 @@ imageUrl: "${imageUrl}"
     }]
   );
 
-  const content = resp.data.choices[0].message.content.trim();
-  return JSON.parse(content);
+  // const content = resp.data.choices[0].message.content.trim();
+  // return JSON.parse(content);
+  
+  // 1) RAW 응답
+  const raw   = resp.data.choices[0].message.content;
+  // 2) 코드펜스·태그 제거
+  const clean = cleanJsonString(raw);
+  // 3) JSON 파싱
+  let parsed;
+  try {
+    parsed = JSON.parse(clean);
+  } catch (err) {
+    console.error("TitleDesc JSON 파싱 실패:", { raw, clean, err });
+    // 파싱 실패 시 기본 fallback
+    return { title: "Untitled", description: "" };
+  }
+
+  // 4) title·description 유효성 검사
+  if (typeof parsed !== "object" || !parsed.title) {
+    console.warn("TitleDesc 응답에 title 누락:", parsed);
+    parsed.title = parsed.title || "Untitled";
+  }
+  if (!parsed.description) {
+    parsed.description = parsed.description || "";
+  }
+
+  return parsed;
 }
 
 // Express 앱 초기화 및 미들웨어 설정
