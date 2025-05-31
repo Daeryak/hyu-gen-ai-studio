@@ -46,11 +46,10 @@ function LandingHome() {
             <p style={styles.subtitle}>
               생성형 AI 기반 감정 인식 그래픽 스튜디오 <strong>GEN.AI</strong>에서는<br />
               감정을 새로운 방식으로 해석하고 기록합니다.<br />
-              당신의 문장 속에 담긴 당신의 하루와 감정을<br />
-              색과 결 속에 담아 한 편의 이미지로 변환합니다.<br />
+              당신의 문장 속에 담긴 감정을 추출하여<br />
+              다양한 색과 형태를 가진 이미지로 변환합니다.<br />
               보이지 않던 감정의 변화를 시각적으로 마주하며,<br />
-              보다 풍부한 감정의 지평을 경험하도록 이끕니다.<br />
-              스스로를 돌아보는 여정을 <strong>GEN.AI</strong>와 함께 시작해 보세요.
+              스스로를 돌아보는 여정을 시작해 보세요.
             </p>
           </div>
 
@@ -115,11 +114,12 @@ const styles = {
     fontSize: '3rem',         // 글자 크기 증가
     lineHeight: 1.6,
     margin: 0,
-    marginTop: '25px',        // 약간 아래로 내림
+    marginTop: '40px',        // 약간 아래로 내림
     marginLeft: '100px',      // 좌측 여백 100px
     marginBottom: '1rem',
     color: '#383325',
-    fontWeight: 700,
+    fontWeight: 600,
+    letterSpacing: '-1.3px'
   },
   subtitleBox: {
     marginTop: '124px',       // 타이틀보다 124px 아래
@@ -159,7 +159,7 @@ const styles = {
   startText: {
     position: 'absolute',
     top: 11,                  // 디자인 기준 Y 위치
-    left: 30,                 // 디자인 기준 X 위치
+    left: 38,                 // 디자인 기준 X 위치
     color: '#383325',
     fontSize: 32,
     fontFamily: 'Pretendard, sans-serif',
@@ -170,10 +170,10 @@ const styles = {
   startUnderline: {
     position: 'absolute',
     top: 45,                // 텍스트 baseline + lineHeight + 여유
-    left: 30,
+    left: 38,
     width: 170,
     height: 0,
-    outline: '2px solid #383325',
+    outline: '1.4px solid #383325',
     outlineOffset: '-1px'
   }
 };

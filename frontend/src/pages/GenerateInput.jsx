@@ -185,7 +185,7 @@ function GenerateInput() {
               떠오르는대로 편하게 털어놔 주세요.
             </h3>
             <textarea
-              style={styles.textArea}
+              style={{...styles.textArea, color: userText ? '#383325' : '#9e9e9e'}}
               placeholder="오늘 있었던 일이나 인상적이었던 기억, 혹은 지금 느껴지는 감정이나 생각을 말해주세요. 어떤 내용이라도 감정을 분석해드릴 수 있어요."
               maxLength={1500}
               value={userText}
@@ -385,11 +385,12 @@ const styles = {
     width: '600px',
     height: '480px',
     resize: 'vertical',
+    fontFamily: 'Pretendard, sans-serif',
     fontSize: '16px',
     padding: '0.5rem',
     boxSizing: 'border-box',
     borderRadius: '25.2px',
-    color: '#9e9e9e',
+    // color: '#9e9e9e',
     padding: '25px',
   },
   analyzeBox: {
