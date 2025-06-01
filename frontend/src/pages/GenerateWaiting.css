@@ -43,7 +43,8 @@
     z-index: 0;
   
     /* 애니메이션: 9초 주기, 무한 반복 */
-    animation: animateLeftBottom 10s infinite ease-in-out;
+    /* animation: animateLeftBottom 10s infinite ease-in-out; */
+    animation: animateLeftBottom 10s infinite linear;
   }
   
   /* 왼쪽 위 원 애니메이션:
@@ -115,26 +116,26 @@
     0% {
       transform: translate(-20px, 0) scale(1) rotate(0deg);
       background-color: rgba(136, 211, 255, 0.55);
-      filter: blur(20px);
-    }
-    25% {
-      transform: translate(-80px, 80px) scale(1.25) rotate(90deg);
-      background-color: rgba(136, 211, 255, 0.8);
       filter: blur(40px);
     }
+    25% {
+      transform: translate(-80px, 80px) scale(1.25) rotate(450deg);
+      background-color: rgba(136, 211, 255, 0.8);
+      filter: blur(60px);
+    }
     50% {
-      transform: translate(40px, -40px) scale(1.15) rotate(180deg);
+      transform: translate(40px, -40px) scale(1.15) rotate(540deg);
       background-color: rgba(136, 211, 255, 0.3);
       filter: blur(80px);
     }
     75% {
-      transform: translate(100px, 60px) scale(1.4) rotate(270deg);
+      transform: translate(100px, 60px) scale(1.4) rotate(630deg);
       background-color: rgba(136, 211, 255, 0.6);
       filter: blur(60px);
     }
     100% {
-      transform: translate(0, 0) scale(1) rotate(360deg);
+      transform: translate(-20px, 0) scale(1) rotate(720deg);
       background-color: rgba(136, 211, 255, 0.55);
-      filter: blur(20px);
+      filter: blur(40px);
     }
   }  

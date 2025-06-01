@@ -1,9 +1,68 @@
-// src/pages/GenerateOutput.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 //import Header from '../Components/Header';
 import {authService} from "../firebase.js";
 import { onAuthStateChanged } from 'firebase/auth';
+
+// 로컬 SVG 아이콘을 ReactComponent 형태로 불러오기
+import { ReactComponent as JoyIcon } from '../joy.svg';
+import { ReactComponent as SadnessIcon } from '../sadness.svg';
+import { ReactComponent as AngerIcon } from '../anger.svg';
+import { ReactComponent as SurpriseIcon } from '../surprise.svg';
+import { ReactComponent as AnticipationIcon } from '../anticipation.svg';
+import { ReactComponent as DisgustIcon } from '../disgust.svg';
+import { ReactComponent as TrustIcon } from '../trust.svg';
+import { ReactComponent as FearIcon } from '../fear.svg';
+
+// 감정별 색상 (선택 시 텍스트 색으로 사용)
+// 배경에는 투명도 0.2를 적용하기 위해 아래 색상의 RGB 값을 함께 정의합니다.
+const EMOTION_COLORS = {
+  joy:    { hex: '#FFCA00', rgb: '255, 202, 0'   },
+  sadness:{ hex: '#50AAFF', rgb: '80, 170, 255' },
+  anger:  { hex: '#DA3838', rgb: '218, 56, 56'  },
+  surprise:{hex: '#A4E214', rgb: '164, 226, 20' },
+  anticipation:{ hex: '#FF6A2A', rgb: '255, 106, 42' },
+  disgust:{ hex: '#8E42A1', rgb: '142, 66, 161' },
+  trust:  { hex: '#339E60', rgb: '51, 158, 96'  },
+  fear:   { hex: '#383325', rgb: '56, 51, 37'   },
+};
+
+// EMOTION_CONFIG: 감정 키(key) -> { label, Icon component }
+const EMOTION_CONFIG = {
+  anger: {
+    label: '화나요',
+    Icon: AngerIcon,
+  },
+  anticipation: {
+    label: '기대돼요',
+    Icon: AnticipationIcon,
+  },
+  joy: {
+    label: '기뻐요',
+    Icon: JoyIcon,
+  },
+  surprise: {
+    label: '놀라워요',
+    Icon: SurpriseIcon,
+  },
+  trust: {
+    label: '신뢰해요',
+    Icon: TrustIcon,
+  },
+  sadness: {
+    label: '슬퍼요',
+    Icon: SadnessIcon,
+  },
+  disgust: {
+    label: '역겨워요',
+    Icon: DisgustIcon,
+  },
+  fear: {
+    label: '두려워요',
+    Icon: FearIcon,
+  },
+};
+
 
 function GenerateInput() {
   const navigate = useNavigate();
@@ -21,17 +80,11 @@ function GenerateInput() {
     });
     return () => unsubscribe();
   }, []);
+
   // 현재 날짜 (로컬 시간 사용) - 퍼블리싱 때문에 좀 바꿈
   // const [currentDate, setCurrentDate] = useState('');  
   const [monthDay, setMonthDay] = useState('');
   const [year, setYear] = useState('');
-  // 감정 강도
-  const [emotionLevel, setEmotionLevel] = useState(50);
-  // 감정 종류 (멀티 선택 가능)
-  const emotionKinds = ['joy', 'sadness', 'anger', 'surprise', 'anticipation', 'disgust', 'trust', 'fear'];
-  const [selectedEmotions, setSelectedEmotions] = useState([]);
-  // 텍스트 입력 (1500자 이내)
-  const [userText, setUserText] = useState('');
   // 컴포넌트 마운트 시 현재 날짜 초기화
   useEffect(() => {
     const now = new Date();
@@ -46,6 +99,11 @@ function GenerateInput() {
     setYear(yr);
   }, []);
 
+  // 감정 강도
+  const [emotionLevel, setEmotionLevel] = useState(50);
+  // 감정 종류 (멀티 선택 가능)
+  const emotionKinds = ['anger', 'anticipation', 'joy', 'surprise', 'trust', 'sadness', 'disgust', 'fear'];
+  const [selectedEmotions, setSelectedEmotions] = useState([]);
   // 감정 종류 체크박스 클릭 핸들러
   const handleEmotionCheck = (kind) => {
     if (selectedEmotions.includes(kind)) {
@@ -54,6 +112,9 @@ function GenerateInput() {
       setSelectedEmotions([...selectedEmotions, kind]);
     }
   };
+
+  // 텍스트 입력 (1500자 이내)
+  const [userText, setUserText] = useState('');
 
   // 분석하기 버튼 클릭 핸들러
   const handleAnalyze = async () => {
@@ -80,15 +141,11 @@ function GenerateInput() {
         body: JSON.stringify(dataToSend),
       });
       console.log('fetch 호출 후, response.status:', response.status);
-  
-
       // if (!response.ok) {
       //   throw new Error('API 호출 실패, 상태 코드: ' + response.status);
       // }
-
       const result = await response.json();
       console.log('API 응답 JSON:', result);
-
       // 작업 요청에 대한 jobId를 받아 localStorage에 저장
       if (result.success && result.jobId) {
         localStorage.setItem('jobId', result.jobId);
@@ -101,7 +158,6 @@ function GenerateInput() {
       console.error('분석 에러:', error);
       console.error('분석 에러:', error.message);
       alert('분석 중 오류가 발생했습니다: ' + error.message);
-      navigate('/generatewaiting');
     }
   };
 
@@ -159,23 +215,44 @@ function GenerateInput() {
               style={styles.rangeInput}
             />
           </div> */}
+
+     {/* 감정 종류 선택 버튼 */}
           <div style={styles.emotionKindsBox}>
-            {/* <p style={styles.emotionKindsLabel}></p> */}
             <div style={styles.emotionKindsList}>
-              {emotionKinds.map((kind) => (
-                <label key={kind} style={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={selectedEmotions.includes(kind)}
-                    onChange={() => handleEmotionCheck(kind)}
-                    style={styles.checkboxInput}
-                  />
-                  {kind}
-                </label>
-              ))}
+              {emotionKinds.map((kind) => {
+                const { label, Icon } = EMOTION_CONFIG[kind];
+                const isSelected = selectedEmotions.includes(kind);
+                const { hex, rgb } = EMOTION_COLORS[kind];
+
+                return (
+                  <button
+                    key={kind}
+                    type="button"
+                    onClick={() => handleEmotionCheck(kind)}
+                    style={{
+                      ...styles.emotionButtonBase,
+                      background: isSelected
+                        ? `rgba(${rgb}, 0.2)`
+                        : 'transparent',
+                      color: isSelected ? hex : '#383325',
+                      fontWeight: 400,
+                      borderColor: '#383325',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = '0.5';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                  >
+                    <span style={styles.emotionText}>{label}</span>
+                    <Icon style={styles.emotionIcon} />
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </section>
+          </section>
 
         {/* 오른쪽 영역 */}
         <section style={styles.rightSection}>
@@ -236,13 +313,32 @@ const styles = {
     boxSizing: 'border-box',
     // overflowY: 'auto',
   },
-  // circlePlaceholder: {
-  //   width: '80px',
-  //   height: '80px',
-  //   borderRadius: '50%',
-  //   backgroundColor: '#eee',
-  //   marginBottom: '1rem',
-  // },
+  // 감정 종류 버튼 공통 (비선택 상태)
+  emotionButtonBase: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '140px',
+    height: '48px',
+    padding: '10px 18px',
+    gap: '6px',
+    borderRadius: '55px',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    background: 'transparent',
+    border: '1.17px solid #383325',
+    outline: 'none',
+  },
+  emotionText: {
+    fontSize: '20px',
+    fontWeight: 400,
+    fontFamily: 'Pretendard, sans-serif',
+    whiteSpace: 'nowrap',
+  },
+  emotionIcon: {
+    width: '28px',
+    height: '28px',
+  },
 
   // =============================================================
   // archiver 선택하는 파트
@@ -343,26 +439,26 @@ const styles = {
     position: 'absolute',
     top: '400px',   // 참고로 archiverBox(top:170px)
     left: '250px',  // archiverBox와 동일한 left 값
-    width: '600px', // 위의 날짜와 대강 오른쪽 끝 맞추기
+    width: '650px', // 위의 날짜와 대강 오른쪽 끝 맞추기
   },
-  emotionKindsLabel: {
-    marginBottom: '0.5rem',
-    fontWeight: 500,
-  },
+  // emotionKindsLabel: {
+  //   marginBottom: '0.5rem',
+  //   fontWeight: 500,
+  // },
   emotionKindsList: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '0.5rem',
+    gap: '1rem',
   },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    fontSize: '0.95rem',
-  },
-  checkboxInput: {
-    cursor: 'pointer',
-  },
+  // checkboxLabel: {
+  //   display: 'flex',
+  //   alignItems: 'center',
+  //   gap: '0.3rem',
+  //   fontSize: '0.95rem',
+  // },
+  // checkboxInput: {
+  //   cursor: 'pointer',
+  // },
 
   // =============================================================
   // 우측에 하루 느낌 입력하는 파트

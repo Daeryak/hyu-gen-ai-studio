@@ -169,12 +169,14 @@ const styles = {
   },
   startUnderline: {
     position: 'absolute',
-    top: 45,                // 텍스트 baseline + lineHeight + 여유
+    // 텍스트 바닥(baseline)에 딱 붙도록 top 값을 조금만 더 내립니다.
+    top: 45,
     left: 38,
+    // width는 텍스트 길이에 맞춰 170px로 고정
     width: 170,
-    height: 0,
-    outline: '1.4px solid #383325',
-    outlineOffset: '-1px'
+    // border-bottom 대신 높이(height)와 배경(background-color)으로 굵은 실선처럼 쭉 그립니다.
+    height: 1.5,                    
+    backgroundColor: '#383325',   // 검은색 계열(#383325)
   }
 };
 

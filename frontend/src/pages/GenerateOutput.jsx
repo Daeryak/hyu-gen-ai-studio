@@ -202,11 +202,11 @@ const styles = {
     width: '500px',
     maxHeight: '140px',
     overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
-    overflow: 'hidden',
+    // overflow: 'hidden',
     marginBottom: '60px'
   },
   promptText: {
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 500,
     lineHeight: '24px',
     textAlign: 'right',
@@ -274,8 +274,8 @@ const styles = {
   descriptionBlock: {
     width: '700px',          // 고정 너비
     alignSelf: 'flex-end',   // 오른쪽 끝 정렬
-    maxHeight: '200px',
-    overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
+    maxHeight: '250px',
+    // overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
     marginBottom: '100px'    // 아래 여백
   },
   descriptionText: {
