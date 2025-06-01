@@ -158,7 +158,7 @@ function GenerateInput() {
         throw new Error("작업 요청 실패");
        }
       setIsActiveAnalyze(false);
-      alert('이미지 생성 요청 완료! 잠시 기다려주세요.');
+      // alert('이미지 생성 요청 완료! 잠시 기다려주세요.'); // 짜친다는 의견
     } catch (error) {
       setIsActiveAnalyze(false);
       console.error('분석 에러:', error.message);
@@ -234,15 +234,21 @@ function GenerateInput() {
                     key={kind}
                     type="button"
                     onClick={() => handleEmotionCheck(kind)}
-                    style={{
+                          style={{
                       ...styles.emotionButtonBase,
-                      background: isSelected
-                        ? `rgba(${rgb}, 0.2)`
-                        : 'transparent',
-                      color: isSelected ? hex : '#383325',
+                      background: isSelected ? `rgba(${EMOTION_COLORS[kind].rgb}, 0.2)` : 'transparent',
+                      color: isSelected
+                        ? hex
+                        : hex,
+                        // : `rgba(${EMOTION_COLORS[kind].rgb}, 1)`,
+                      /* 선택되든 안 되든 텍스트와 아이콘 색상은 항상 hex 
+                        만약 비선택 시에도 hex보다 좀 옅은 색으로 하려면
+                        color: isSelected ? hex : `rgba(${EMOTION_COLORS[kind].rgb}, 0.8)`*/
+                      border: isSelected
+                        ? 'none'
+                        : `1.17px solid ${hex}`,
                       fontWeight: 400,
-                      borderColor: '#383325',
-                    }}
+                    }} 
                     onMouseEnter={(e) => {
                       e.currentTarget.style.opacity = '0.5';
                     }}
@@ -352,7 +358,7 @@ const styles = {
     cursor: 'pointer',
     transition: 'all 0.2s ease',
     background: 'transparent',
-    border: '1.17px solid #383325',
+    border: '1.17px solid',
     outline: 'none',
   },
   emotionText: {
