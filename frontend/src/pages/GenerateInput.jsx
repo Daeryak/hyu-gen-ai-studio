@@ -116,10 +116,15 @@ function GenerateInput() {
   // 텍스트 입력 (1500자 이내)
   const [userText, setUserText] = useState('');
 
+  // 호버/활성 상태용 로컬 상태 추가
+  const [isHoveredAnalyze, setIsHoveredAnalyze] = useState(false);
+  const [isActiveAnalyze, setIsActiveAnalyze] = useState(false);
   // 분석하기 버튼 클릭 핸들러
   const handleAnalyze = async () => {
     console.log("handleAnalyze called");
     try {
+      // 버튼을 클릭하면 active 상태를 잠깐 true로 두었다가 호출 직후 false로 되돌리기
+      setIsActiveAnalyze(true);
       // 전송할 데이터 구성
       const dataToSend = {
         userText,
@@ -127,7 +132,6 @@ function GenerateInput() {
         selectedEmotions,
       };
       console.log('전송할 데이터:', dataToSend);
-
       // 새로 만든 우리 모델 API 엔드포인트 호출
       // 그러면 firebase.json의 rewrites 설정에 따라 functions의 exports.api 함수로 전달
       // 인증된 사용자만 호출할 수 있도록
@@ -153,9 +157,10 @@ function GenerateInput() {
       } else {
         throw new Error("작업 요청 실패");
        }
+      setIsActiveAnalyze(false);
       alert('이미지 생성 요청 완료! 잠시 기다려주세요.');
     } catch (error) {
-      console.error('분석 에러:', error);
+      setIsActiveAnalyze(false);
       console.error('분석 에러:', error.message);
       alert('분석 중 오류가 발생했습니다: ' + error.message);
     }
@@ -270,7 +275,28 @@ function GenerateInput() {
             />
           </div>
           <div style={styles.analyzeBox}>
-            <button style={styles.analyzeButton} onClick={handleAnalyze}>
+            {/* 이벤트 핸들러 연결: onMouseEnter, onMouseLeave, onMouseDown, onMouseUp */}
+            <button
+              style={{
+                ...styles.analyzeButton,
+                // 호버 상태가 true면 약간 투명하게 (opacity) 또는 그림자 추가
+                opacity: isHoveredAnalyze ? 0.85 : 1,
+                transform: isActiveAnalyze ? 'translateY(2px)' : 'translateY(0)',
+                boxShadow: isActiveAnalyze
+                  ? '0 0px 4px rgba(0,0,0,0.1)'         // 클릭했을 때 살짝 내부 그림자
+                  : isHoveredAnalyze
+                  ? '0 0px 10px rgba(0,0,0,0.1)'       // 호버 시 더 부드러운 그림자
+                  : '0 0px 3px rgba(0,0,0,0.18)',         // 기본 그림자
+              }}
+              onMouseEnter={() => setIsHoveredAnalyze(true)}
+              onMouseLeave={() => {
+                setIsHoveredAnalyze(false);
+                setIsActiveAnalyze(false); // 마우스를 떠나면 active도 false로 리셋
+              }}
+              onMouseDown={() => setIsActiveAnalyze(true)}
+              onMouseUp={() => setIsActiveAnalyze(false)}
+              onClick={handleAnalyze}
+            >
               분석하기 &rarr;
             </button>
           </div>
@@ -516,6 +542,7 @@ const styles = {
     color: '#383325',
     textTransform: 'none',
     gap: '9.64px',                        // 텍스트와 화살표 사이 간격
+    transition: 'opacity 0.3s ease, box-shadow 0.5s ease, transform 0.3s ease',
   },
 };
 
