@@ -312,7 +312,7 @@ function GenerateInput() {
   );
 }
 
-const HEADER_HEIGHT = 60;
+// const HEADER_HEIGHT = '10rem';
 
 const styles = {
   container: {
@@ -328,15 +328,16 @@ const styles = {
   main: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: HEADER_HEIGHT,
-    height: `calc(100vh - ${HEADER_HEIGHT}px)`,
+    marginTop: '8rem',
+    // height: `calc(100vh - 14rem)`,
+
   },
   leftSection: {
     flex: 1,
     // borderRight: '1px solid #eee',
     padding: '2rem',
     boxSizing: 'border-box',
-    overflowY: 'auto',
+    // overflowY: 'auto',
   },
   rightSection: {
     position: 'relative',
@@ -377,7 +378,7 @@ const styles = {
   archiverBox: {
     // marginBottom: '2rem',
     position: 'absolute',
-    top: '160px',
+    top: '14rem',
     left: '250px',
     display: 'flex',             // flex 컨테이너로 만들어서
     alignItems: 'baseline',      // 글자 기준선 맞추기
@@ -407,7 +408,7 @@ const styles = {
   emotionLevelBox: {
     // marginBottom: '2rem',
     position: 'absolute',
-    top: '270px',   // 참고로 archiverBox(top:170px)
+    top: '22rem',
     left: '250px',  // archiverBox와 동일한 left 값
     width: '600px', // 위의 날짜와 대강 오른쪽 끝 맞추기
     fontsize: '32px',
@@ -469,7 +470,7 @@ const styles = {
   emotionKindsBox: {
     // marginBottom: '2rem',
     position: 'absolute',
-    top: '400px',   // 참고로 archiverBox(top:170px)
+    top: '30rem',   
     left: '250px',  // archiverBox와 동일한 left 값
     width: '650px', // 위의 날짜와 대강 오른쪽 끝 맞추기
   },

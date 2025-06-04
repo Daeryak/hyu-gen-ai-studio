@@ -197,18 +197,19 @@ const styles = {
 
   // 1) userText
   promptBlock: {
-    marginTop: '100px',
+    marginTop: '4rem',
     alignSelf: 'flex-end',
-    width: '500px',
-    maxHeight: '140px',
+    width: '30rem',
+    maxHeight: '15rem',
     overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
     // overflow: 'hidden',
-    marginBottom: '60px'
+    marginBottom: '2rem'
   },
   promptText: {
     fontSize: '16px',
     fontWeight: 500,
     lineHeight: '24px',
+    maxHeight: '15rem',
     textAlign: 'right',
     color: 'var(--neutral-neutral-1-main-text, #555555)'
   },
@@ -217,8 +218,8 @@ const styles = {
   userInfoRow: {
     display: 'flex',
     justifyContent: 'flex-end', // 오른쪽 정렬
-    gap: '360px', // 둘 사이의 갭
-    marginBottom: '80px'
+    gap: '20rem', // 둘 사이의 갭
+    marginBottom: '4.5rem'
   },
   nicknameText: {
     whiteSpace: 'pre-line',
@@ -240,8 +241,8 @@ const styles = {
   titleBlock: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginTop: '40px',
-    marginBottom: '24px'
+    marginTop: '5rem',
+    marginBottom: '2rem'
   },
   titleText: {
     fontSize: '32px',
@@ -258,7 +259,7 @@ const styles = {
     fontWeight: 500,
     textAlign: 'right',
     color: '#777',
-    marginBottom: '4px'
+    marginBottom: '0.4rem'
   },
   // 5) On
   onText: {
@@ -267,21 +268,21 @@ const styles = {
     fontWeight: 500,
     textAlign: 'right',
     color: '#777',
-    marginBottom: '24px'
+    marginBottom: '2rem'
   },
 
   // 6) Description
   descriptionBlock: {
     width: '700px',          // 고정 너비
     alignSelf: 'flex-end',   // 오른쪽 끝 정렬
-    maxHeight: '250px',
+    maxHeight: '17rem',
     // overflowY: 'auto',       // 내용 넘치면 안에서 스크롤
-    marginBottom: '100px'    // 아래 여백
+    marginBottom: '6rem'    // 아래 여백
   },
   descriptionText: {
-    fontSize: '16px',
+    fontSize: '17px',
     fontWeight: 500,
-    lineHeight: '24px',
+    lineHeight: '26px',
     textAlign: 'right',
     color: 'var(--neutral-neutral-1-main-text, #555)'
   },

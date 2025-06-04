@@ -68,7 +68,7 @@ function LandingHome() {
   );
 }
 
-const HEADER_HEIGHT = 60;
+// const HEADER_HEIGHT = 60;
 const LEFT_RATIO = 712;
 const RIGHT_RATIO = 800;
 const TOTAL_RATIO = LEFT_RATIO + RIGHT_RATIO; // 1512
@@ -95,7 +95,7 @@ const styles = {
   // },
   mainArea: {
     position: 'absolute',
-    top: `${HEADER_HEIGHT}px`, // 헤더 바로 아래
+    top: '8.5rem', // 헤더 바로 아래
     left: 0,
     right: 0,
     bottom: 0,
@@ -122,12 +122,12 @@ const styles = {
     letterSpacing: '-1.3px'
   },
   subtitleBox: {
-    marginTop: '124px',       // 타이틀보다 124px 아래
+    marginTop: '10rem',     
     marginRight: '80px',      // 오른쪽 여백 80px
     textAlign: 'right',       // 우측 정렬
   },
   subtitle: {
-    fontSize: '1.12rem',      // 글자 크기 증가
+    fontSize: '1.25rem',      // 글자 크기 증가
     fontWeight: 500,
     color: '#383325',
     lineHeight: 1.8,
